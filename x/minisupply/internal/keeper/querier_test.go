@@ -41,7 +41,7 @@ func TestNewQuerier(t *testing.T) {
 	bz, errRes := cdc.MarshalJSON(queryTotalSupplyParams)
 	require.Nil(t, errRes)
 
-	query.Path = fmt.Sprintf("/custom/supply/%s", types.QueryTotalSupply)
+	query.Path = fmt.Sprintf("/custom/minisupply/%s", types.QueryTotalSupply)
 	query.Data = bz
 
 	_, err = querier(ctx, []string{types.QueryTotalSupply}, query)
@@ -51,7 +51,7 @@ func TestNewQuerier(t *testing.T) {
 	bz, errRes = cdc.MarshalJSON(querySupplyParams)
 	require.Nil(t, errRes)
 
-	query.Path = fmt.Sprintf("/custom/supply/%s", types.QuerySupplyOf)
+	query.Path = fmt.Sprintf("/custom/minisupply/%s", types.QuerySupplyOf)
 	query.Data = bz
 
 	_, err = querier(ctx, []string{types.QuerySupplyOf}, query)
@@ -83,7 +83,7 @@ func TestQuerySupply(t *testing.T) {
 		Data: []byte{},
 	}
 
-	query.Path = fmt.Sprintf("/custom/supply/%s", types.QueryTotalSupply)
+	query.Path = fmt.Sprintf("/custom/minisupply/%s", types.QueryTotalSupply)
 	query.Data = bz
 
 	res, err := querier(ctx, []string{types.QueryTotalSupply}, query)
@@ -98,7 +98,7 @@ func TestQuerySupply(t *testing.T) {
 	bz, errRes = cdc.MarshalJSON(querySupplyParams)
 	require.Nil(t, errRes)
 
-	query.Path = fmt.Sprintf("/custom/supply/%s", types.QuerySupplyOf)
+	query.Path = fmt.Sprintf("/custom/minisupply/%s", types.QuerySupplyOf)
 	query.Data = bz
 
 	res, err = querier(ctx, []string{types.QuerySupplyOf}, query)

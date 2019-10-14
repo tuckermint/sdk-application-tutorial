@@ -150,14 +150,16 @@ func NewNameServiceApp(
         // superbank takes a minisupplyKeeper to allow for tuck centralization defense
         // minisupply is supply that doesn't take a bankKeeper
         // it is only used for the GetSupply method
+        app.minisupplyKeeper = minisupply.NewKeeper(
+		app.cdc,
+		keys[minisupply.StoreKey],
+		app.accountKeeper,
+		maccPerms,
+	)
+
 	app.bankKeeper = superbank.NewBaseKeeper(
 		app.accountKeeper,
-		minisupply.NewKeeper(
-			app.cdc,
-			keys[minisupply.StoreKey],
-			app.accountKeeper,
-			maccPerms,
-		),
+		app.minisupplyKeeper,
 		bankSupspace,
 		superbank.DefaultCodespace,
 		app.ModuleAccountAddrs(),
@@ -221,12 +223,13 @@ func NewNameServiceApp(
 		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
-		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+		superbank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		nameservice.NewAppModule(app.nsKeeper, app.bankKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
+                minisupply.NewAppModule(app.minisupplyKeeper, app.accountKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
@@ -240,7 +243,8 @@ func NewNameServiceApp(
 		distr.ModuleName,
 		staking.ModuleName,
 		auth.ModuleName,
-		bank.ModuleName,
+                minisupply.ModuleName,
+		superbank.ModuleName,
 		slashing.ModuleName,
 		nameservice.ModuleName,
 		supply.ModuleName,

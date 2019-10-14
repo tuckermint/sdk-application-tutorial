@@ -19,13 +19,13 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	// Query the total supply of coins
 	r.HandleFunc(
-		"/supply/total",
+		"/minisupply/total",
 		totalSupplyHandlerFn(cliCtx),
 	).Methods("GET")
 
 	// Query the supply of a single denom
 	r.HandleFunc(
-		"/supply/total/{denom}",
+		"/minisupply/total/{denom}",
 		supplyOfHandlerFn(cliCtx),
 	).Methods("GET")
 }

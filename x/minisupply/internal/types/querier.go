@@ -8,7 +8,7 @@ const (
 
 // QueryTotalSupply defines the params for the following queries:
 //
-// - 'custom/supply/totalSupply'
+// - 'custom/minisupply/totalSupply'
 type QueryTotalSupplyParams struct {
 	Page, Limit int
 }
@@ -20,7 +20,7 @@ func NewQueryTotalSupplyParams(page, limit int) QueryTotalSupplyParams {
 
 // QuerySupplyOfParams defines the params for the following queries:
 //
-// - 'custom/supply/totalSupplyOf'
+// - 'custom/minisupply/totalSupplyOf'
 type QuerySupplyOfParams struct {
 	Denom string
 }
