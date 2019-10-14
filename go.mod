@@ -1,4 +1,4 @@
-module github.com/cosmos/sdk-application-tutorial
+module github.com/tuckermint/sdk-application-tutorial
 
 go 1.13
 
@@ -14,5 +14,6 @@ require (
 	github.com/tendermint/tendermint v0.32.6
 	github.com/tendermint/tm-db v0.2.0
 	golang.org/x/sys v0.0.0-20190329044733-9eb1bfa1ce65 // indirect
+	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 )

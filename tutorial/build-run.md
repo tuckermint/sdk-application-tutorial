@@ -18,7 +18,7 @@ source ~/.bash_profile
 Now, you can install and run the application.
 ```
 # Clone the source of the tutorial repository
-git clone https://github.com/cosmos/sdk-application-tutorial.git
+git clone https://github.com/tuckermint/sdk-application-tutorial.git
 cd sdk-application-tutorial
 ```
 
