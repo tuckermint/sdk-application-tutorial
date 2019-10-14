@@ -12,7 +12,6 @@ require (
 	github.com/tendermint/go-amino v0.15.0
 	github.com/tendermint/tendermint v0.32.6
 	github.com/tendermint/tm-db v0.2.0
-	github.com/tuckermint/cosmos-sdk v0.37.4
 	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 	gopkg.in/yaml.v2 v2.2.4

@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 	vestexported "github.com/cosmos/cosmos-sdk/x/auth/vesting/exported"
-	"github.com/tuckermint/cosmos-sdk/x/superbank/internal/types"
+	"github.com/tuckermint/sdk-application-tutorial/x/superbank/internal/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
 
