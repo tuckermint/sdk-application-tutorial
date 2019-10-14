@@ -1,4 +1,4 @@
-package operations
+package superbank
 
 import (
 	"fmt"
@@ -8,16 +8,16 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tuckermint/sdk-application-tutorial/x/superbank"
+	"github.com/tuckermint/sdk-application-tutorial/x/superbank/internal/keeper"
 	"github.com/tuckermint/sdk-application-tutorial/x/superbank/internal/types"
 	"github.com/cosmos/cosmos-sdk/x/mock"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 )
 
-// SimulateMsgSend tests and runs a single msg send where both
+// SendTx tests and runs a single msg send where both
 // accounts already exist.
-func SimulateMsgSend(mapper types.AccountKeeper, bk bank.Keeper) simulation.Operation {
-	handler := bank.NewHandler(bk)
+func SimulateMsgSend(mapper types.AccountKeeper, bk keeper.Keeper) simulation.Operation {
+	handler := NewHandler(bk)
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simulation.Account) (
 		opMsg simulation.OperationMsg, fOps []simulation.FutureOperation, err error) {
 
@@ -90,7 +90,7 @@ func sendAndVerifyMsgSend(app *baseapp.BaseApp, mapper types.AccountKeeper, msg 
 		res := app.Deliver(tx)
 		if !res.IsOK() {
 			// TODO: Do this in a more 'canonical' way
-			return fmt.Errorf("deliver failed %v", res)
+			return fmt.Errorf("Deliver failed %v", res)
 		}
 	}
 
@@ -108,10 +108,10 @@ func sendAndVerifyMsgSend(app *baseapp.BaseApp, mapper types.AccountKeeper, msg 
 	return nil
 }
 
-// SimulateSingleInputMsgMultiSend tests and runs a single msg multisend, with one input and one output, where both
+// SingleInputSendMsg tests and runs a single msg multisend, with one input and one output, where both
 // accounts already exist.
-func SimulateSingleInputMsgMultiSend(mapper types.AccountKeeper, bk bank.Keeper) simulation.Operation {
-	handler := bank.NewHandler(bk)
+func SimulateSingleInputMsgMultiSend(mapper types.AccountKeeper, bk keeper.Keeper) simulation.Operation {
+	handler := NewHandler(bk)
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simulation.Account) (
 		opMsg simulation.OperationMsg, fOps []simulation.FutureOperation, err error) {
 
@@ -198,7 +198,7 @@ func sendAndVerifyMsgMultiSend(app *baseapp.BaseApp, mapper types.AccountKeeper,
 		res := app.Deliver(tx)
 		if !res.IsOK() {
 			// TODO: Do this in a more 'canonical' way
-			return fmt.Errorf("deliver failed %v", res)
+			return fmt.Errorf("Deliver failed %v", res)
 		}
 	}
 

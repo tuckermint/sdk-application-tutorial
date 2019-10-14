@@ -3,7 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
-        supplyexported "github.com/cosmos/cosmos-sdk/x/supply/exported"
+        supplyexported "github.com/tuckermint/sdk-application-tutorial/x/minisupply/exported"
 )
 
 // AccountKeeper defines the account contract that must be fulfilled when
@@ -16,16 +16,6 @@ type AccountKeeper interface {
 	SetAccount(ctx sdk.Context, acc exported.Account)
 
 	IterateAccounts(ctx sdk.Context, process func(exported.Account) bool)
-}
-
-// BankKeeper defines the expected bank keeper (noalias)
-type BankKeeper interface {
-	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) sdk.Error
-	DelegateCoins(ctx sdk.Context, fromAdd, toAddr sdk.AccAddress, amt sdk.Coins) sdk.Error
-	UndelegateCoins(ctx sdk.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) sdk.Error
-
-	SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Error)
-	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Error)
 }
 
 // SupplyKeeper defines the expected supply Keeper (noalias)

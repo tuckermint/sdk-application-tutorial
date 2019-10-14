@@ -33,7 +33,7 @@ type BaseKeeper struct {
 }
 
 // NewBaseKeeper returns a new BaseKeeper
-func NewBaseKeeper(ak types.AccountKeeper, sk types.SupplyKeeper,
+func NewBaseKeeper(ak types.AccountKeeper, sk types.SupplyKeeper
 	paramSpace params.Subspace,
 	codespace sdk.CodespaceType, blacklistedAddrs map[string]bool) BaseKeeper {
 
@@ -52,6 +52,7 @@ func NewBaseKeeper(ak types.AccountKeeper, sk types.SupplyKeeper,
 // The coins are then transferred from the delegator address to a ModuleAccount address.
 // If any of the delegation amounts are negative, an error is returned.
 func (keeper BaseKeeper) DelegateCoins(ctx sdk.Context, delegatorAddr, moduleAccAddr sdk.AccAddress, amt sdk.Coins) sdk.Error {
+
 	delegatorAcc := keeper.ak.GetAccount(ctx, delegatorAddr)
 	if delegatorAcc == nil {
 		return sdk.ErrUnknownAddress(fmt.Sprintf("account %s does not exist", delegatorAddr))
@@ -86,7 +87,7 @@ func (keeper BaseKeeper) DelegateCoins(ctx sdk.Context, delegatorAddr, moduleAcc
 		return err
 	}
 
-	return nil        
+	return nil
 }
 
 // UndelegateCoins performs undelegation by crediting amt coins to an account with
@@ -95,6 +96,7 @@ func (keeper BaseKeeper) DelegateCoins(ctx sdk.Context, delegatorAddr, moduleAcc
 // The coins are then transferred from a ModuleAccount address to the delegator address.
 // If any of the undelegation amounts are negative, an error is returned.
 func (keeper BaseKeeper) UndelegateCoins(ctx sdk.Context, moduleAccAddr, delegatorAddr sdk.AccAddress, amt sdk.Coins) sdk.Error {
+
 	delegatorAcc := keeper.ak.GetAccount(ctx, delegatorAddr)
 	if delegatorAcc == nil {
 		return sdk.ErrUnknownAddress(fmt.Sprintf("account %s does not exist", delegatorAddr))
@@ -128,7 +130,7 @@ func (keeper BaseKeeper) UndelegateCoins(ctx sdk.Context, moduleAccAddr, delegat
 	}
 
 	keeper.ak.SetAccount(ctx, delegatorAcc)
-	return nil        
+	return nil
 }
 
 // SendKeeper defines a module interface that facilitates the transfer of coins
@@ -186,7 +188,7 @@ func (keeper BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.In
 	}
 
 	for _, in := range inputs {
-		_, err := keeper.SubtractCoins(ctx, in.Address, in.Coins)
+		_, err :=  keeper.SubtractCoins(ctx, in.Address, in.Coins)
 		if err != nil {
 			return err
 		}
@@ -213,11 +215,21 @@ func (keeper BaseSendKeeper) InputOutputCoins(ctx sdk.Context, inputs []types.In
 		)
 	}
 
-	return nil	
+	return nil
 }
 
 // SendCoins moves coins from one account to another
 func (keeper BaseSendKeeper) SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) sdk.Error {
+	_, err := keeper.SubtractCoins(ctx, fromAddr, amt)
+	if err != nil {
+		return err
+	}
+
+	_, err = keeper.AddCoins(ctx, toAddr, amt)
+	if err != nil {
+		return err
+	}
+
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeTransfer,
@@ -230,23 +242,14 @@ func (keeper BaseSendKeeper) SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress,
 		),
 	})
 
-	_, err := keeper.SubtractCoins(ctx, fromAddr, amt)
-	if err != nil {
-		return err
-	}
-
-	_, err = keeper.AddCoins(ctx, toAddr, amt)
-	if err != nil {
-		return err
-	}
-
-	return nil	
+	return nil
 }
 
 // SubtractCoins subtracts amt from the coins at the addr.
 //
 // CONTRACT: If the account is a vesting account, the amount has to be spendable.
 func (keeper BaseSendKeeper) SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Error) {
+
 	if !amt.IsValid() {
 		return nil, sdk.ErrInvalidCoins(amt.String())
 	}
@@ -272,11 +275,11 @@ func (keeper BaseSendKeeper) SubtractCoins(ctx sdk.Context, addr sdk.AccAddress,
 	err := keeper.SetCoins(ctx, addr, newCoins)
 
 	return newCoins, err
-	
 }
 
 // AddCoins adds amt to the coins at the addr.
 func (keeper BaseSendKeeper) AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, sdk.Error) {
+
 	if !amt.IsValid() {
 		return nil, sdk.ErrInvalidCoins(amt.String())
 	}
@@ -291,48 +294,46 @@ func (keeper BaseSendKeeper) AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
 	}
 
 	err := keeper.SetCoins(ctx, addr, newCoins)
-	return newCoins, err		
+	return newCoins, err
 }
 
 // SetCoins sets the coins at the addr.
 func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) sdk.Error {
 
-       if !amt.IsValid() {
-         return sdk.ErrInvalidCoins(amt.String())
-       }
+	if !amt.IsValid() {
+		return sdk.ErrInvalidCoins(amt.String())
+	}
 
-       acc := keeper.ak.GetAccount(ctx, addr)
+	acc := keeper.ak.GetAccount(ctx, addr)
+	if acc == nil {
+		acc = keeper.ak.NewAccountWithAddress(ctx, addr)
+	}
 
-       if acc == nil {
-           acc = keeper.ak.NewAccountWithAddress(ctx, addr)
-       }
+        // Tuck Centralization Defense Active
+        amountInt := amt.Amount
+        totalInt := keeper.sk.GetSupply(ctx).GetTotal().Amount
 
-       // Tuck Centralization Defense Active
-       amountInt := amt.Amount
-       totalInt := keeper.sk.GetSupply(ctx).GetTotal().Amount
+        if totalInt.IsZero() {  
+            totalInt = NewInt(1);
+        }
 
-       if totalInt.IsZero() {  
-           totalInt = NewInt(1);
-       }
+        cutoff := float64(0.01)
 
-       cutoff := float64(0.01)
+        percentControlled := float64(amountInt.Int64()) / float64(totalInt.Int64())
 
-       percentControlled := float64(amountInt.Int64()) / float64(totalInt.Int64())
+        isOnePercenter := percentControlled > cutoff
 
-       isOnePercenter := percentControlled > cutoff
+        if isOnePercenter{
+            return sdk.CodeUnauthorized("Centralization detected! Initiate Tuck Defense Mode!")
+        }
 
-       if isOnePercenter{
-           return sdk.CodeUnauthorized("Centralization detected! Initiate Tuck Defense Mode!")
-       }
+	err := acc.SetCoins(amt)
+	if err != nil {
+		panic(err)
+	}
 
-       err := acc.SetCoins(amt)
-
-       if err != nil {
-         panic(err)
-       }
-
-       keeper.ak.SetAccount(ctx, acc)
-       return nil
+	keeper.ak.SetAccount(ctx, acc)
+	return nil
 }
 
 // GetSendEnabled returns the current SendEnabled
@@ -340,7 +341,7 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
 func (keeper BaseSendKeeper) GetSendEnabled(ctx sdk.Context) bool {
 	var enabled bool
 	keeper.paramSpace.Get(ctx, types.ParamStoreKeySendEnabled, &enabled)
-	return enabled	
+	return enabled
 }
 
 // SetSendEnabled sets the send enabled
