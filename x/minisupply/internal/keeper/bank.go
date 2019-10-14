@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tuckermint/sdk-application-tutorial/x/minisupply/internal/types"
 )
 
 // SendCoinsFromModuleToAccount transfers coins from a ModuleAccount to an AccAddress
