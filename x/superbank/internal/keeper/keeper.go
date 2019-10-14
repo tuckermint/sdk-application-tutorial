@@ -33,13 +33,13 @@ type BaseKeeper struct {
 }
 
 // NewBaseKeeper returns a new BaseKeeper
-func NewBaseKeeper(ak types.AccountKeeper, sk types.SupplyKeeper
+func NewBaseKeeper(ak types.AccountKeeper, sk types.SupplyKeeper,
 	paramSpace params.Subspace,
 	codespace sdk.CodespaceType, blacklistedAddrs map[string]bool) BaseKeeper {
 
 	ps := paramSpace.WithKeyTable(types.ParamKeyTable())
 	return BaseKeeper{
-		BaseSendKeeper: NewBaseSendKeeper(ak, ps, codespace, blacklistedAddrs),
+		BaseSendKeeper: NewBaseSendKeeper(ak, sk, ps, codespace, blacklistedAddrs),
 		ak:             ak,
                 sk:             sk,
 		paramSpace:     ps,
@@ -310,23 +310,34 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
 	}
 
         // Tuck Centralization Defense Active
-        amountInt := amt.Amount
-        totalInt := keeper.sk.GetSupply(ctx).GetTotal().Amount
-
-        if totalInt.IsZero() {  
-            totalInt = NewInt(1);
-        }
-
+        // n squared but everyone sends only one coin anyway
+        // I will use a map if it's slow
         cutoff := float64(0.01)
+        totalSupply := keeper.sk.GetSupply(ctx).GetTotal()
 
-        percentControlled := float64(amountInt.Int64()) / float64(totalInt.Int64())
+	for i := 0; i < len(amt); i++ {
+	    amountInt := amt[i].Amount
+            amountDenom := amt[i].Denom
 
-        isOnePercenter := percentControlled > cutoff
+            for j := 0; j < len(totalSupply); j++{
+                supplyDenom := totalSupply[j].Denom
+                supplyInt := totalSupply[j].Amount
 
-        if isOnePercenter{
-            return sdk.CodeUnauthorized("Centralization detected! Initiate Tuck Defense Mode!")
-        }
+                if amountDenom == supplyDenom {
+                    if supplyInt.IsZero() {
+                        return sdk.ErrInvalidCoins(amt.String())  // this coin has no supply
+                    }
 
+                    percentControlled := float64(amountInt.Int64()) / float64(supplyInt.Int64())
+                    isOnePercenter := percentControlled > cutoff
+		    if isOnePercenter{
+                        return sdk.ErrInvalidCoins(amt.String())
+		    }
+	            break;
+                }
+            }
+	}
+        
 	err := acc.SetCoins(amt)
 	if err != nil {
 		panic(err)
