@@ -6,8 +6,8 @@
 package superbank
 
 import (
-	"github.com/cosmos/cosmos-sdk/x/superbank/internal/keeper"
-	"github.com/cosmos/cosmos-sdk/x/superbank/internal/types"
+	"github.com/tuckermint/sdk-application-tutorial/x/superbank/internal/keeper"
+	"github.com/tuckermint/sdk-application-tutorial/x/superbank/internal/types"
 )
 
 const (
