@@ -16,7 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	//"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genaccounts"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
@@ -26,6 +26,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
+        "github.com/tuckermint/sdk-application-tutorial/x/superbank"
+        "github.com/tuckermint/sdk-application-tutorial/x/minisupply"
+
 )
 
 const appName = "nameservice"
@@ -42,7 +45,7 @@ var (
 		genaccounts.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
-		bank.AppModuleBasic{},
+		superbank.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		params.AppModuleBasic{},
@@ -50,6 +53,7 @@ var (
 		supply.AppModuleBasic{},
 
 		nameservice.AppModule{},
+                minisupply.AppModuleBasic{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
@@ -79,13 +83,14 @@ type nameServiceApp struct {
 
 	// Keepers
 	accountKeeper  auth.AccountKeeper
-	bankKeeper     bank.Keeper
+	bankKeeper     superbank.Keeper
 	stakingKeeper  staking.Keeper
 	slashingKeeper slashing.Keeper
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	nsKeeper       nameservice.Keeper
+        minisupplyKeeper minisupply.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -105,7 +110,7 @@ func NewNameServiceApp(
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, nameservice.StoreKey)
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, nameservice.StoreKey, minisupply.StoreKey)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -121,7 +126,7 @@ func NewNameServiceApp(
 	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
 	// Set specific supspaces
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
-	bankSupspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
+	bankSupspace := app.paramsKeeper.Subspace(superbank.DefaultParamspace)
 	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
 	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
 	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
@@ -135,10 +140,26 @@ func NewNameServiceApp(
 	)
 
 	// The BankKeeper allows you perform sdk.Coins interactions
-	app.bankKeeper = bank.NewBaseKeeper(
+	//app.bankKeeper = bank.NewBaseKeeper(
+	//	app.accountKeeper,
+	//	bankSupspace,
+	//	bank.DefaultCodespace,
+	//	app.ModuleAccountAddrs(),
+	//)
+
+        // superbank takes a minisupplyKeeper to allow for tuck centralization defense
+        // minisupply is supply that doesn't take a bankKeeper
+        // it is only used for the GetSupply method
+	app.bankKeeper = superbank.NewBaseKeeper(
 		app.accountKeeper,
+		minisupply.NewKeeper(
+			app.cdc,
+			keys[minisupply.StoreKey],
+			app.accountKeeper,
+			maccPerms,
+		),
 		bankSupspace,
-		bank.DefaultCodespace,
+		superbank.DefaultCodespace,
 		app.ModuleAccountAddrs(),
 	)
 
