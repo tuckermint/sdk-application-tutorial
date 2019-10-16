@@ -326,6 +326,7 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
         // Tuck Centralization Defense Active
         // n squared but everyone sends only one coin anyway
         // I will use a map if it's slow
+        /*
         if len(amt) > 0 {        
 		cutoff := float64(0.01)
 		totalSupply := keeper.sk.GetSupply(ctx).GetTotal()
@@ -352,7 +353,7 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
 			}
 		    }
 		}
-        }
+        } */
         
         
 	err := acc.SetCoins(amt)

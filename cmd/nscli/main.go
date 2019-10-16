@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	bankcmd "github.com/tuckermint/sdk-application-tutorial/x/superbank/client/cli"
 	app "github.com/tuckermint/sdk-application-tutorial"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

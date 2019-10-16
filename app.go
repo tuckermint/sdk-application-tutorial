@@ -159,6 +159,7 @@ func NewNameServiceApp(
 	app.bankKeeper = superbank.NewBaseKeeper(
 		app.accountKeeper,
 		app.minisupplyKeeper,
+                //nil,
 		bankSupspace,
 		superbank.DefaultCodespace,
 		app.ModuleAccountAddrs(),
