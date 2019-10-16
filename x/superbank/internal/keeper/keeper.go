@@ -309,34 +309,51 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
 		acc = keeper.ak.NewAccountWithAddress(ctx, addr)
 	}
 
-        // Tuck Centralization Defense Active
-        // n squared but everyone sends only one coin anyway
-        // I will use a map if it's slow
-        cutoff := float64(0.01)
-        totalSupply := keeper.sk.GetSupply(ctx).GetTotal()
+        fmt.Println("len amt: ", len(amt))
 
+        //test
 	for i := 0; i < len(amt); i++ {
 	    amountInt := amt[i].Amount
             amountDenom := amt[i].Denom
 
-            for j := 0; j < len(totalSupply); j++{
-                supplyDenom := totalSupply[j].Denom
-                supplyInt := totalSupply[j].Amount
-
-                if amountDenom == supplyDenom {
-                    if supplyInt.IsZero() {
-                        return sdk.ErrInvalidCoins(amt.String())  // this coin has no supply
-                    }
-
-                    percentControlled := float64(amountInt.Int64()) / float64(supplyInt.Int64())
-                    isOnePercenter := percentControlled > cutoff
-		    if isOnePercenter{
-                        return sdk.ErrInvalidCoins(amt.String())
-		    }
-	            break;
-                }
-            }
+            fmt.Println("--amount-")
+            fmt.Println("Denom: ", amountDenom)
+            fmt.Println("Amount: ", amountInt)
+            fmt.Println("---")
 	}
+        
+
+        // Tuck Centralization Defense Active
+        // n squared but everyone sends only one coin anyway
+        // I will use a map if it's slow
+        if len(amt) > 0 {        
+		cutoff := float64(0.01)
+		totalSupply := keeper.sk.GetSupply(ctx).GetTotal()
+
+		for i := 0; i < len(amt); i++ {
+		    amountInt := amt[i].Amount
+		    amountDenom := amt[i].Denom
+
+		    for j := 0; j < len(totalSupply); j++{
+			supplyDenom := totalSupply[j].Denom
+			supplyInt := totalSupply[j].Amount
+
+			if amountDenom == supplyDenom {
+			    if supplyInt.IsZero() {
+				return sdk.ErrInvalidCoins(amt.String())  // this coin has no supply
+			    }
+
+			    percentControlled := float64(amountInt.Int64()) / float64(supplyInt.Int64())
+			    isOnePercenter := percentControlled > cutoff
+			    if isOnePercenter{
+				return sdk.ErrInvalidCoins(amt.String())
+			    }
+			    break;
+			}
+		    }
+		}
+        }
+        
         
 	err := acc.SetCoins(amt)
 	if err != nil {

@@ -46,14 +46,13 @@ var (
 		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
 		superbank.AppModuleBasic{},
-		staking.AppModuleBasic{},
-		distr.AppModuleBasic{},
-		params.AppModuleBasic{},
-		slashing.AppModuleBasic{},
-		supply.AppModuleBasic{},
-
+                params.AppModuleBasic{},
 		nameservice.AppModule{},
                 minisupply.AppModuleBasic{},
+		staking.AppModuleBasic{},
+		distr.AppModuleBasic{},		
+		slashing.AppModuleBasic{},
+		supply.AppModuleBasic{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
@@ -110,7 +109,7 @@ func NewNameServiceApp(
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, nameservice.StoreKey, minisupply.StoreKey)
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, nameservice.StoreKey) //minisupply key removed
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -152,7 +151,7 @@ func NewNameServiceApp(
         // it is only used for the GetSupply method
         app.minisupplyKeeper = minisupply.NewKeeper(
 		app.cdc,
-		keys[minisupply.StoreKey],
+		keys[supply.StoreKey],
 		app.accountKeeper,
 		maccPerms,
 	)
@@ -225,11 +224,12 @@ func NewNameServiceApp(
 		auth.NewAppModule(app.accountKeeper),
 		superbank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		nameservice.NewAppModule(app.nsKeeper, app.bankKeeper),
+                minisupply.NewAppModule(app.minisupplyKeeper, app.accountKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
-                minisupply.NewAppModule(app.minisupplyKeeper, app.accountKeeper),
+
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
@@ -243,11 +243,11 @@ func NewNameServiceApp(
 		distr.ModuleName,
 		staking.ModuleName,
 		auth.ModuleName,
-                minisupply.ModuleName,
 		superbank.ModuleName,
 		slashing.ModuleName,
 		nameservice.ModuleName,
-		supply.ModuleName,
+                //minisupply.ModuleName,  supply might not go here
+		//supply.ModuleName,
 		genutil.ModuleName,
 	)
 
