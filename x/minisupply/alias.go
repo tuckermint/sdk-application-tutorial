@@ -46,5 +46,5 @@ type (
 	Keeper        = keeper.Keeper
 	ModuleAccount = types.ModuleAccount
 	GenesisState  = types.GenesisState
-	Supply        = types.Supply
+	Supply        = types.MiniSupply
 )
