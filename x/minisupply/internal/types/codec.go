@@ -10,7 +10,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*exported.ModuleAccountI)(nil), nil)
 	cdc.RegisterInterface((*exported.MiniSupplyI)(nil), nil)
 	cdc.RegisterConcrete(&ModuleAccount{}, "cosmos-sdk/ModuleAccount", nil)
-	cdc.RegisterConcrete(&Supply{}, "cosmos-sdk/Supply", nil)
+	cdc.RegisterConcrete(&MiniSupply{}, "cosmos-sdk/MiniSupply", nil)
 }
 
 // ModuleCdc generic sealed codec to be used throughout module
