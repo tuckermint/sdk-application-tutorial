@@ -15,14 +15,14 @@ type ModuleAccountI interface {
 	HasPermission(string) bool
 }
 
-// SupplyI defines an inflationary supply interface for modules that handle
+// MiniSupplyI defines an inflationary supply interface for modules that handle
 // token supply.
-type SupplyI interface {
+type MiniSupplyI interface {
 	GetTotal() sdk.Coins
-	SetTotal(total sdk.Coins) SupplyI
+	SetTotal(total sdk.Coins) MiniSupplyI
 
-	Inflate(amount sdk.Coins) SupplyI
-	Deflate(amount sdk.Coins) SupplyI
+	Inflate(amount sdk.Coins) MiniSupplyI
+	Deflate(amount sdk.Coins) MiniSupplyI
 
 	String() string
 	ValidateBasic() error

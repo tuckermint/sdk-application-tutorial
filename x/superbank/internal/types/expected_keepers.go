@@ -20,5 +20,5 @@ type AccountKeeper interface {
 
 // SupplyKeeper defines the expected supply Keeper (noalias)
 type SupplyKeeper interface {
-	GetSupply(ctx sdk.Context) supplyexported.SupplyI
+	GetSupply(ctx sdk.Context) supplyexported.MiniSupplyI
 }

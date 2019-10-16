@@ -41,7 +41,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // GetSupply retrieves the Supply from store
-func (k Keeper) GetSupply(ctx sdk.Context) (supply exported.SupplyI) {
+func (k Keeper) GetSupply(ctx sdk.Context) (supply exported.MiniSupplyI) {
 	store := ctx.KVStore(k.storeKey)
 	b := store.Get(SupplyKey)
 	if b == nil {
@@ -52,7 +52,7 @@ func (k Keeper) GetSupply(ctx sdk.Context) (supply exported.SupplyI) {
 }
 
 // SetSupply sets the Supply to store
-func (k Keeper) SetSupply(ctx sdk.Context, supply exported.SupplyI) {
+func (k Keeper) SetSupply(ctx sdk.Context, supply exported.MiniSupplyI) {
 	store := ctx.KVStore(k.storeKey)
 	b := k.cdc.MustMarshalBinaryLengthPrefixed(supply)
 	store.Set(SupplyKey, b)

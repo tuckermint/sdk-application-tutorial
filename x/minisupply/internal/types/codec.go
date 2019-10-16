@@ -8,7 +8,7 @@ import (
 // RegisterCodec registers the account types and interface
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*exported.ModuleAccountI)(nil), nil)
-	cdc.RegisterInterface((*exported.SupplyI)(nil), nil)
+	cdc.RegisterInterface((*exported.MiniSupplyI)(nil), nil)
 	cdc.RegisterConcrete(&ModuleAccount{}, "cosmos-sdk/ModuleAccount", nil)
 	cdc.RegisterConcrete(&Supply{}, "cosmos-sdk/Supply", nil)
 }
