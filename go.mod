@@ -15,4 +15,5 @@ require (
 	github.com/tendermint/tm-db v0.2.0
 	golang.org/x/sys v0.0.0-20190329044733-9eb1bfa1ce65 // indirect
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
+	gopkg.in/yaml.v2 v2.2.2
 )
