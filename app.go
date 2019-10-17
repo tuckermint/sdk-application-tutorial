@@ -16,7 +16,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	//"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genaccounts"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
@@ -28,21 +27,20 @@ import (
         "github.com/tuckermint/sdk-application-tutorial/x/superbank"
 )
 
-const appName = "nameservice"
+const appName = "tuckermint"
 
 var (
 	// default home directories for the application CLI
-	DefaultCLIHome = os.ExpandEnv("$HOME/.nscli")
+	DefaultCLIHome = os.ExpandEnv("$HOME/.tuckermintcli")
 
 	// DefaultNodeHome sets the folder where the applcation data and configuration will be stored
-	DefaultNodeHome = os.ExpandEnv("$HOME/.nsd")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.tuckermintd")
 
 	// NewBasicManager is in charge of setting up basic module elemnets
 	ModuleBasics = module.NewBasicManager(
 		genaccounts.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
-		//bank.AppModuleBasic{},
                 superbank.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		distr.AppModuleBasic{},
@@ -68,7 +66,7 @@ func MakeCodec() *codec.Codec {
 	return cdc
 }
 
-type nameServiceApp struct {
+type tuckermintApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
@@ -78,7 +76,6 @@ type nameServiceApp struct {
 
 	// Keepers
 	accountKeeper  auth.AccountKeeper
-	//bankKeeper     bank.Keeper
         bankKeeper     superbank.Keeper
 	stakingKeeper  staking.Keeper
 	slashingKeeper slashing.Keeper
@@ -91,10 +88,10 @@ type nameServiceApp struct {
 	mm *module.Manager
 }
 
-// NewNameServiceApp is a constructor function for nameServiceApp
-func NewNameServiceApp(
+// NewTuckermintApp is a constructor function for tuckermintApp
+func NewTuckermintApp(
 	logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp),
-) *nameServiceApp {
+) *tuckermintApp {
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -110,7 +107,7 @@ func NewNameServiceApp(
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	// Here you initialize your application with the store keys it requires
-	var app = &nameServiceApp{
+	var app = &tuckermintApp{
 		BaseApp: bApp,
 		cdc:     cdc,
 		keys:    keys,
@@ -121,7 +118,6 @@ func NewNameServiceApp(
 	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
 	// Set specific supspaces
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
-	//bankSupspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
 	bankSupspace := app.paramsKeeper.Subspace(superbank.DefaultParamspace)
 	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
 	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
@@ -134,16 +130,6 @@ func NewNameServiceApp(
 		authSubspace,
 		auth.ProtoBaseAccount,
 	)
-
-	// The BankKeeper allows you perform sdk.Coins interactions
-        /*
-	app.bankKeeper = bank.NewBaseKeeper(
-		app.accountKeeper,
-		bankSupspace,
-		bank.DefaultCodespace,
-		app.ModuleAccountAddrs(),
-	)*/
-
 
         app.banklessSupplyKeeper = supply.NewKeeper(
 		app.cdc,
@@ -213,7 +199,6 @@ func NewNameServiceApp(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		superbank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		//bank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
                 supply.NewAppModule(app.banklessSupplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
@@ -233,7 +218,6 @@ func NewNameServiceApp(
 		staking.ModuleName,
 		auth.ModuleName,
                 superbank.ModuleName,
-		//bank.ModuleName,
 		slashing.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,
@@ -275,7 +259,7 @@ func NewDefaultGenesisState() GenesisState {
 	return ModuleBasics.DefaultGenesis()
 }
 
-func (app *nameServiceApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *tuckermintApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 
 	err := app.cdc.UnmarshalJSON(req.AppStateBytes, &genesisState)
@@ -286,18 +270,18 @@ func (app *nameServiceApp) InitChainer(ctx sdk.Context, req abci.RequestInitChai
 	return app.mm.InitGenesis(ctx, genesisState)
 }
 
-func (app *nameServiceApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *tuckermintApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
-func (app *nameServiceApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *tuckermintApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
-func (app *nameServiceApp) LoadHeight(height int64) error {
+func (app *tuckermintApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *nameServiceApp) ModuleAccountAddrs() map[string]bool {
+func (app *tuckermintApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
@@ -308,7 +292,7 @@ func (app *nameServiceApp) ModuleAccountAddrs() map[string]bool {
 
 //_________________________________________________________
 
-func (app *nameServiceApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
+func (app *tuckermintApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
 ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block
