@@ -3,7 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
-        supplyexported "github.com/tuckermint/sdk-application-tutorial/x/minisupply/exported"
+        supplyexported "github.com/cosmos/cosmos-sdk/x/supply/exported"
 )
 
 // AccountKeeper defines the account contract that must be fulfilled when
@@ -20,5 +20,5 @@ type AccountKeeper interface {
 
 // SupplyKeeper defines the expected supply Keeper (noalias)
 type SupplyKeeper interface {
-	GetSupply(ctx sdk.Context) supplyexported.MiniSupplyI
+	GetSupply(ctx sdk.Context) supplyexported.SupplyI
 }

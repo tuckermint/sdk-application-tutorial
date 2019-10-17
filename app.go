@@ -25,9 +25,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
-	//"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
         "github.com/tuckermint/sdk-application-tutorial/x/superbank"
-        "github.com/tuckermint/sdk-application-tutorial/x/minisupply"
 )
 
 const appName = "nameservice"
@@ -50,10 +48,7 @@ var (
 		distr.AppModuleBasic{},
 		params.AppModuleBasic{},
 		slashing.AppModuleBasic{},
-                minisupply.AppModuleBasic{},
 		supply.AppModuleBasic{},
-
-		//nameservice.AppModule{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
@@ -89,9 +84,8 @@ type nameServiceApp struct {
 	slashingKeeper slashing.Keeper
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
+        banklessSupplyKeeper supply.Keeper
 	paramsKeeper   params.Keeper
-	//nsKeeper       nameservice.Keeper
-        minisupplyKeeper minisupply.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -150,19 +144,18 @@ func NewNameServiceApp(
 		app.ModuleAccountAddrs(),
 	)*/
 
-        // superbank takes a minisupplyKeeper to allow for tuck centralization defense
-        // minisupply is supply that doesn't take a bankKeeper
-        // it is only used for the GetSupply method
-        app.minisupplyKeeper = minisupply.NewKeeper(
+
+        app.banklessSupplyKeeper = supply.NewKeeper(
 		app.cdc,
 		keys[supply.StoreKey],
 		app.accountKeeper,
+		nil,
 		maccPerms,
 	)
 
 	app.bankKeeper = superbank.NewBaseKeeper(
 		app.accountKeeper,
-		app.minisupplyKeeper,
+                app.banklessSupplyKeeper,
 		bankSupspace,
 		superbank.DefaultCodespace,
 		app.ModuleAccountAddrs(),
@@ -214,23 +207,15 @@ func NewNameServiceApp(
 			app.slashingKeeper.Hooks()),
 	)
 
-	// The NameserviceKeeper is the Keeper from the module for this tutorial
-	// It handles interactions with the namestore
-	/*app.nsKeeper = nameservice.NewKeeper(
-		app.bankKeeper,
-		keys[nameservice.StoreKey],
-		app.cdc,
-	)*/
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
-                minisupply.NewAppModule(app.minisupplyKeeper, app.accountKeeper),
 		superbank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		//bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		//nameservice.NewAppModule(app.nsKeeper, app.bankKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
+                supply.NewAppModule(app.banklessSupplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
@@ -247,11 +232,9 @@ func NewNameServiceApp(
 		distr.ModuleName,
 		staking.ModuleName,
 		auth.ModuleName,
-                minisupply.ModuleName,
                 superbank.ModuleName,
 		//bank.ModuleName,
 		slashing.ModuleName,
-		//nameservice.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,
 	)
