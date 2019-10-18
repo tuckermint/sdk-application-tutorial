@@ -1,14 +1,14 @@
 # Querier
 
-首先创建`./x/nameservice/querier.go`文件。在这里定义应用程序用户可以对那些状态进行查询。你的`nameservice`模块会暴露两个querier:
+首先创建`./x/tuckermint/querier.go`文件。在这里定义应用程序用户可以对那些状态进行查询。你的`tuckermint`模块会暴露两个querier:
 
-- `resolve` : 传入一个`域名`返回`nameservice`给定的`解析值`。类似于DNS查询。
+- `resolve` : 传入一个`域名`返回`tuckermint`给定的`解析值`。类似于DNS查询。
 - `whois` : 传入一个`域名`返回`价格`，`解析值`和域名的`所有者`。用于确定你想要购买名称的成本。
 
 首先定义`NewQuerier`函数，该函数充当查询此模块的子路由器（类似于`NewHandler`函数）。请注意，因为querier没有类似于Msg的接口，所以需要手动定义switch语句（它们无法从query.Route()函数中删除）：
 
 ```go
-package nameservice
+package tuckermint
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// query endpoints supported by the nameservice Querier
+// query endpoints supported by the tuckermint Querier
 const (
 	QueryResolve = "resolve"
 	QueryWhois   = "whois"
@@ -38,7 +38,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryNames:
 			return queryNames(ctx, req, keeper)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown nameservice query endpoint")
+			return nil, sdk.ErrUnknownRequest("unknown tuckermint query endpoint")
 		}
 	}
 }

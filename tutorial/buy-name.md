@@ -2,7 +2,7 @@
 
 ## Msg
 
-Now it is time to define the `Msg` for buying names and add it to the `./x/nameservice/types/msgs.go` file. This code is very similar to `SetName`:
+Now it is time to define the `Msg` for buying names and add it to the `./x/tuckermint/types/msgs.go` file. This code is very similar to `SetName`:
 
 ```go
 // MsgBuyName defines the BuyName message
@@ -52,10 +52,10 @@ func (msg MsgBuyName) GetSigners() []sdk.AccAddress {
 }
 ```
 
-Next, in the `./x/nameservice/handler.go` file, add the `MsgBuyName` handler to the module router:
+Next, in the `./x/tuckermint/handler.go` file, add the `MsgBuyName` handler to the module router:
 
 ```go
-// NewHandler returns a handler for "nameservice" type messages.
+// NewHandler returns a handler for "tuckermint" type messages.
 func NewHandler(keeper Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
@@ -64,7 +64,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 		case MsgBuyName:
 			return handleMsgBuyName(ctx, keeper, msg)
 		default:
-			errMsg := fmt.Sprintf("Unrecognized nameservice Msg type: %v", msg.Type())
+			errMsg := fmt.Sprintf("Unrecognized tuckermint Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
@@ -98,7 +98,7 @@ func handleMsgBuyName(ctx sdk.Context, keeper Keeper, msg MsgBuyName) sdk.Result
 
 First check to make sure that the bid is higher than the current price. Then, check to see whether the name already has an owner. If it does, the former owner will receive the money from the `Buyer`.
 
-If there is no owner, your `nameservice` module "burns" (i.e. sends to an unrecoverable address) the coins from the `Buyer`.
+If there is no owner, your `tuckermint` module "burns" (i.e. sends to an unrecoverable address) the coins from the `Buyer`.
 
 If either `SubtractCoins` or `SendCoins` returns a non-nil error, the handler throws an error, reverting the state transition. Otherwise, using the getters and setters defined on the `Keeper` earlier, the handler sets the buyer to the new owner and sets the new price to be the current bid.
 

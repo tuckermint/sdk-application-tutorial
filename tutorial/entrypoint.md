@@ -2,17 +2,17 @@
 
 In golang the convention is to place files that compile to a binary in the `./cmd` folder of a project. For your application there are 2 binaries that you want to create:
 
-- `nsd`: This binary is similar to `bitcoind` or other cryptocurrency daemons in that it maintains p2p connections, propagates transactions, handles local storage and provides an RPC interface to interact with the network. In this case, Tendermint is used for networking and transaction ordering.
-- `nscli`: This binary provides commands that allow users to interact with your application.
+- `tmd`: This binary is similar to `bitcoind` or other cryptocurrency daemons in that it maintains p2p connections, propagates transactions, handles local storage and provides an RPC interface to interact with the network. In this case, Tendermint is used for networking and transaction ordering.
+- `tmcli`: This binary provides commands that allow users to interact with your application.
 
 To get started create two files in your project directory that will instantiate these binaries:
 
-- `./cmd/nsd/main.go`
-- `./cmd/nscli/main.go`
+- `./cmd/tmd/main.go`
+- `./cmd/tmcli/main.go`
 
-## `nsd`
+## `tmd`
 
-Start by adding the following code to `cmd/nsd/main.go`:
+Start by adding the following code to `cmd/tmd/main.go`:
 
 > _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }`).
 
@@ -54,8 +54,8 @@ func main() {
 	ctx := server.NewDefaultContext()
 
 	rootCmd := &cobra.Command{
-		Use:               "nsd",
-		Short:             "nameservice App Daemon (server)",
+		Use:               "tmd",
+		Short:             "tuckermint App Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 	// CLI commands to initialize the chain
@@ -79,7 +79,7 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewNameServiceApp(logger, db)
+	return app.NewTuckermintApp(logger, db)
 }
 
 func exportAppStateAndTMValidators(
@@ -87,7 +87,7 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		nsApp := app.NewNameServiceApp(logger, db)
+		nsApp := app.NewTuckermintApp(logger, db)
 		err := nsApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
@@ -95,7 +95,7 @@ func exportAppStateAndTMValidators(
 		return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	nsApp := app.NewNameServiceApp(logger, db)
+	nsApp := app.NewTuckermintApp(logger, db)
 
     return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }
@@ -105,9 +105,9 @@ Notes on the above code:
 
 - Most of the code above combines the CLI commands from Tendermint, Cosmos-SDK and your Nameservice module.
 
-## `nscli`
+## `tmcli`
 
-Finish up by building the `nscli` command:
+Finish up by building the `tmcli` command:
 
 > _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }`).
 
@@ -147,8 +147,8 @@ func main() {
 	config.Seal()
 
 	rootCmd := &cobra.Command{
-		Use:   "nscli",
-		Short: "nameservice Client",
+		Use:   "tmcli",
+		Short: "tuckermint Client",
 	}
 
 	// Add --chain-id to persistent flags and mark it required

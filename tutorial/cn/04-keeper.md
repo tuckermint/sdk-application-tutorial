@@ -2,14 +2,14 @@
 
 Cosmos SDK模块的主要核心是名为`Keeper`的部分。它处理同存储的交互，引用其他的keeper进行跨模块的交互，并包含模块的大部分核心功能。
 
-首先创建文件`./x/nameservice/keeper.go`来保存模块的keeper。在 Cosmos SDK 应用程序中，模块通常放在`./x/`文件夹中。
+首先创建文件`./x/tuckermint/keeper.go`来保存模块的keeper。在 Cosmos SDK 应用程序中，模块通常放在`./x/`文件夹中。
 
 ## Keeper结构
 
-开始制作你的SDK模块，请在`./x/nameservice/keeper.go`文件中定义`nameservice.Keeper`：
+开始制作你的SDK模块，请在`./x/tuckermint/keeper.go`文件中定义`tuckermint.Keeper`：
 
 ```go
-package nameservice
+package tuckermint
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -141,10 +141,10 @@ func (k Keeper) GetNamesIterator(ctx sdk.Context) sdk.Iterator {
 }
 ```
 
-最后需要在`./x/nameservice/keeper.go`文件中加上`Keeper`的构造函数：
+最后需要在`./x/tuckermint/keeper.go`文件中加上`Keeper`的构造函数：
 
 ```go
-// NewKeeper creates new instances of the nameservice Keeper
+// NewKeeper creates new instances of the tuckermint Keeper
 func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 	return Keeper{
 		coinKeeper: coinKeeper,

@@ -2,7 +2,7 @@
 
 In this tutorial, you will build a functional [Cosmos SDK](https://github.com/cosmos/cosmos-sdk/) application and, in the process, learn the basic concepts and structures of the SDK. The example will showcase how quickly and easily you can **build your own blockchain from scratch** on top of the Cosmos SDK.
 
-By the end of this tutorial you will have a functional `nameservice` application, a mapping of strings to other strings (`map[string]string`). This is similar to [Namecoin](https://namecoin.org/), [ENS](https://ens.domains/), or [Handshake](https://handshake.org/), which all model the traditional DNS systems (`map[domain]zonefile`). Users will be able to buy unused names, or sell/trade their name.
+By the end of this tutorial you will have a functional `tuckermint` application, a mapping of strings to other strings (`map[string]string`). This is similar to [Namecoin](https://namecoin.org/), [ENS](https://ens.domains/), or [Handshake](https://handshake.org/), which all model the traditional DNS systems (`map[domain]zonefile`). Users will be able to buy unused names, or sell/trade their name.
 
 All of the final source code for this tutorial project is in this directory (and compiles). However, it is best to follow along manually and try building the project yourself!
 
@@ -17,19 +17,19 @@ All of the final source code for this tutorial project is in this directory (and
 Through the course of this tutorial you will create the following files that make up your application:
 
 ```bash
-./nameservice
+./tuckermint
 ├── Makefile
 ├── Makefile.ledger
 ├── app.go
 ├── cmd
-│   ├── nscli
+│   ├── tmcli
 │   │   └── main.go
-│   └── nsd
+│   └── tmd
 │       └── main.go
 ├── go.mod
 ├── go.sum
 └── x
-    └── nameservice
+    └── tuckermint
         ├── alias.go
         ├── client
         │   ├── cli
@@ -58,8 +58,8 @@ Through the course of this tutorial you will create the following files that mak
 Start by creating a new git repository:
 
 ```bash
-mkdir -p $GOPATH/src/github.com/{ .Username }/nameservice
-cd $GOPATH/src/github.com/{ .Username }/nameservice
+mkdir -p $GOPATH/src/github.com/{ .Username }/tuckermint
+cd $GOPATH/src/github.com/{ .Username }/tuckermint
 git init
 ```
 
@@ -80,11 +80,11 @@ Then, just follow along! The first step describes the design of your application
 9. Create the [`alias file`](./alias.md)
 10. Register your types in the encoding format using [`sdk.Codec`](./codec.md).
 11. Create [CLI interactions for your module](./cli.md).
-12. Create [HTTP routes for clients to access your nameservice](./rest.md).
+12. Create [HTTP routes for clients to access your tuckermint](./rest.md).
 13. Implement the [AppModule interface](./module.md)
 14. Configure your [Genesis state](./genesis.md).
 15. Import your module and [finish building your application](./app-complete.md)!
-16. Create the [`nsd` and `nscli` entry points](./entrypoint.md) to your application.
+16. Create the [`tmd` and `tmcli` entry points](./entrypoint.md) to your application.
 17. Setup [dependency management using `go.mod`](./gomod.md).
 18. [Build and run](./build-run.md) the example.
 19. [Run REST routes](./run-rest.md).

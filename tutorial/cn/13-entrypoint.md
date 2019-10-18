@@ -2,17 +2,17 @@
 
 golang 的规范是把编译成可执行程序的文件放在项目的`./cmd`文件夹中。对于你的应用程序，您要创建 2 个可执行程序：
 
-- `nsd` : 此可执行程序类似于`bitcoind`或其他加密货币的 daemon，因为它维护 p2p 连接，广播交易，处理本地存储并提供用以与网络交互的 RPC 接口。在这种情况下，Tendermint 被用于网络层和排序交易。
-- `nscli` : 此可执行程序提供用户与你的应用程序交互的命令。
+- `tmd` : 此可执行程序类似于`bitcoind`或其他加密货币的 daemon，因为它维护 p2p 连接，广播交易，处理本地存储并提供用以与网络交互的 RPC 接口。在这种情况下，Tendermint 被用于网络层和排序交易。
+- `tmcli` : 此可执行程序提供用户与你的应用程序交互的命令。
 
 首先请在项目目录中创建两个将会被实例化成这可执行程序的文件：
 
-- `./cmd/nsd/main.go`
-- `./cmd/nscli/main.go`
+- `./cmd/tmd/main.go`
+- `./cmd/tmcli/main.go`
 
-## `nsd`
+## `tmd`
 
-首先将如下代码加进`nsd/main.go` :
+首先将如下代码加进`tmd/main.go` :
 
 > 注意：你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（`github.com/tuckermint/sdk-application-tutorial`）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}）。
 
@@ -51,7 +51,7 @@ import (
 )
 
 // DefaultNodeHome sets the folder where the application data and configuration will be stored
-var DefaultNodeHome = os.ExpandEnv("$HOME/.nsd")
+var DefaultNodeHome = os.ExpandEnv("$HOME/.tmd")
 
 const (
 	flagOverwrite = "overwrite"
@@ -64,8 +64,8 @@ func main() {
 	ctx := server.NewDefaultContext()
 
 	rootCmd := &cobra.Command{
-		Use:               "nsd",
-		Short:             "nameservice App Daemon (server)",
+		Use:               "tmd",
+		Short:             "tuckermint App Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 
@@ -83,13 +83,13 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewNameServiceApp(logger, db)
+	return app.NewTuckermintApp(logger, db)
 }
 
 func appExporter() server.AppExporter {
 	return func(logger log.Logger, db dbm.DB, _ io.Writer, _ int64, _ bool, _ []string) (
 		json.RawMessage, []tmtypes.GenesisValidator, error) {
-		dapp := app.NewNameServiceApp(logger, db)
+		dapp := app.NewTuckermintApp(logger, db)
 		return dapp.ExportAppStateAndValidators()
 	}
 }
@@ -142,7 +142,7 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 
 			cfg.WriteConfigFile(filepath.Join(config.RootDir, "config", "config.toml"), config)
 
-			fmt.Printf("Initialized nsd configuration and bootstrapping files in %s...\n", viper.GetString(cli.HomeFlag))
+			fmt.Printf("Initialized tmd configuration and bootstrapping files in %s...\n", viper.GetString(cli.HomeFlag))
 			return nil
 		},
 	}
@@ -163,7 +163,7 @@ func AddGenesisAccountCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command 
 		Long: strings.TrimSpace(`
 Adds accounts to the genesis file so that you can start a chain with coins in the CLI:
 
-$ nsd add-genesis-account cosmos1tse7r2fadvlrrgau3pa0ss7cqh55wrv6y9alwh 1000STAKE,1000nametoken
+$ tmd add-genesis-account cosmos1tse7r2fadvlrrgau3pa0ss7cqh55wrv6y9alwh 1000STAKE,1000nametoken
 `),
 		RunE: func(_ *cobra.Command, args []string) error {
 			addr, err := sdk.AccAddressFromBech32(args[0])
@@ -254,13 +254,13 @@ func SimpleAppGenTx(cdc *codec.Codec, pk crypto.PubKey) (
 - 上面的大部分代码都结合了来自以下包的 CLI 命令：
   1. Tendermint
   2. Cosmos-SDK
-  3. 你的 nameservice 模块
+  3. 你的 tuckermint 模块
 - `InitCmd`允许应用程序从配置中生成创世纪状态。深入了解函数调用，以了解有关区块链初始化过程的更多信息。
 - `AddGenesisAccountCmd`可以方便地将帐户添加到创世文件中，允许在区块链启动时就使用资产钱包。
 
-## nscli
+## tmcli
 
-通过构建 nscli 命令完成：
+通过构建 tmcli 命令完成：
 
 > 注意：你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（`github.com/tuckermint/sdk-application-tutorial`）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}）。
 
@@ -287,11 +287,11 @@ import (
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/client/rest"
 	app "github.com/tuckermint/sdk-application-tutorial"
-	nsclient "github.com/tuckermint/sdk-application-tutorial/x/nameservice/client"
-	nsrest "github.com/tuckermint/sdk-application-tutorial/x/nameservice/client/rest"
+	tmclient "github.com/tuckermint/sdk-application-tutorial/x/tuckermint/client"
+	nsrest "github.com/tuckermint/sdk-application-tutorial/x/tuckermint/client/rest"
 )
 
-var defaultCLIHome = os.ExpandEnv("$HOME/.nscli")
+var defaultCLIHome = os.ExpandEnv("$HOME/.tmcli")
 
 func main() {
 	cobra.EnableCommandSorting = false
@@ -306,12 +306,12 @@ func main() {
 	config.Seal()
 
 	mc := []sdk.ModuleClients{
-		nsclient.NewModuleClient(storeNS, cdc),
+		tmclient.NewModuleClient(storeNS, cdc),
 	}
 
 	rootCmd := &cobra.Command{
-		Use:   "nscli",
-		Short: "nameservice Client",
+		Use:   "tmcli",
+		Short: "tuckermint Client",
 	}
 
 	// Add --chain-id to persistent flags and mark it required
@@ -420,7 +420,7 @@ func initConfig(cmd *cobra.Command) error {
 
 注意：
 
-- 代码结合了来自以下包的 CLI 命令：Tendermint、Cosmos-SDK、你的 nameservice 模块。
+- 代码结合了来自以下包的 CLI 命令：Tendermint、Cosmos-SDK、你的 tuckermint 模块。
 - [`cobra` CLI 文档](https://github.com/spf13/cobra)将有助于理解上述代码。
 - 你可以在这里看到之前定义的`ModuleClient`。
 - 注意如何将路由包含在`registerRoutes`函数中

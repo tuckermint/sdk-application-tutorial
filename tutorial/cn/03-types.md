@@ -4,7 +4,7 @@
 
 ## `types.go`
 
-首先创建文件 `./x/nameservice/types.go` 在其内定义模块自有类型，在 Cosmos SDK 应用中，习惯上将模块相关的代码放在 `./x/` 文件夹中。
+首先创建文件 `./x/tuckermint/types.go` 在其内定义模块自有类型，在 Cosmos SDK 应用中，习惯上将模块相关的代码放在 `./x/` 文件夹中。
 
 ## Whois
 
@@ -14,10 +14,10 @@
 - Owner - 该域名当前所有者的地址。
 - Price - 你需要为购买域名支付的费用。
 
-要开始你的 SDK 模块，在 `./x/nameservice/types.go`  文件中定义 `nameservice.Whois` 结构。
+要开始你的 SDK 模块，在 `./x/tuckermint/types.go`  文件中定义 `tuckermint.Whois` 结构。
 
 ```go
-package nameservice
+package tuckermint
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"

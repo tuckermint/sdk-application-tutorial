@@ -8,7 +8,7 @@ A blockchain application is just a [replicated deterministic state machine](http
 
 The [Cosmos SDK](https://github.com/cosmos/cosmos-sdk/) is designed to help you build state machines. The SDK is a **modular framework**, meaning applications are built by aggregating a collection of interoperable modules. Each module contains its own message/transaction processor, while the SDK is responsible for routing each message to its respective module.
 
-Here are the modules you will need for the nameservice application:
+Here are the modules you will need for the tuckermint application:
 
 - `auth`: This module defines accounts and fees and gives access to these functionalities to the rest of your application.
 - `bank`: This module enables the application to create and manage tokens and token balances.
@@ -16,7 +16,7 @@ Here are the modules you will need for the nameservice application:
 - `distribution` : This module give a functional way to passively distribute rewards between validators and delegators.
 - `slashing` : This module disincentivizes people with value staked in the network, ie. Validators.
 - `supply` : This module holds the total supply of the chain.
-- `nameservice`: This module does not exist yet! It will handle the core logic for the `nameservice` application you are building. It is the main piece of software you have to work on to build your application.
+- `tuckermint`: This module does not exist yet! It will handle the core logic for the `tuckermint` application you are building. It is the main piece of software you have to work on to build your application.
 
 Now, take a look at the two main parts of your application: the state and the message types.
 
@@ -24,13 +24,13 @@ Now, take a look at the two main parts of your application: the state and the me
 
 The state represents your application at a given moment. It tells how much token each account possesses, what are the owners and price of each name, and to what value each name resolves to.
 
-The state of tokens and accounts is defined by the `auth` and `bank` modules, which means you don't have to concern yourself with it for now. What you need to do is define the part of the state that relates specifically to your `nameservice` module.
+The state of tokens and accounts is defined by the `auth` and `bank` modules, which means you don't have to concern yourself with it for now. What you need to do is define the part of the state that relates specifically to your `tuckermint` module.
 
 In the SDK, everything is stored in one store called the `multistore`. Any number of key/value stores (called [`KVStores`](https://godoc.org/github.com/cosmos/cosmos-sdk/types#KVStore) in the Cosmos SDK) can be created in this multistore. For this application, we will use one store to map `name`s to its respective `whois`, a struct that holds a name's value, owner, and price.
 
 ## Messages
 
-Messages are contained in transactions. They trigger state transitions. Each module defines a list of messages and how to handle them. Here are the messages you need to implement the desired functionality for your nameservice application:
+Messages are contained in transactions. They trigger state transitions. Each module defines a list of messages and how to handle them. Here are the messages you need to implement the desired functionality for your tuckermint application:
 
 - `MsgSetName`: This message allows name owners to set a value for a given name.
 - `MsgBuyName`: This message allows accounts to buy a name and become its owner.

@@ -2,7 +2,7 @@
 
 现在你的模块已就绪，它可以和其它两个模块[`auth`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/auth)和[`bank`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/bank)被合并到`./app.go`文件中:
 
-> 你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（github.com/tuckermint/sdk-application-tutorial/x/nameservice）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}/x/nameservice）。
+> 你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（github.com/tuckermint/sdk-application-tutorial/x/tuckermint）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}/x/tuckermint）。
 
 ```go
 package app
@@ -17,7 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -28,14 +28,14 @@ import (
 )
 ```
 
-接下来，你需要在`nameServiceApp`结构体中添加存储的key和`Keepers`，并更新构造函数：
+接下来，你需要在`tuckermintApp`结构体中添加存储的key和`Keepers`，并更新构造函数：
 
 ```go
 const (
-	appName = "nameservice"
+	appName = "tuckermint"
 )
 
-type nameServiceApp struct {
+type tuckermintApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
@@ -50,11 +50,11 @@ type nameServiceApp struct {
 	bankKeeper          bank.Keeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	paramsKeeper        params.Keeper
-	nsKeeper            nameservice.Keeper
+	nsKeeper            tuckermint.Keeper
 }
 
-// NewNameServiceApp is a constructor function for nameServiceApp
-func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
+// NewTuckermintApp is a constructor function for tuckermintApp
+func NewTuckermintApp(logger log.Logger, db dbm.DB) *tuckermintApp {
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -63,7 +63,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc))
 
 	// Here you initialize your application with the store keys it requires
-	var app = &nameServiceApp{
+	var app = &tuckermintApp{
 		BaseApp: bApp,
 		cdc:     cdc,
 
@@ -91,8 +91,8 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 你最终的构造函数应该如下所示：
 
 ```go
-// NewNameServiceApp is a constructor function for nameServiceApp
-func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
+// NewTuckermintApp is a constructor function for tuckermintApp
+func NewTuckermintApp(logger log.Logger, db dbm.DB) *tuckermintApp {
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -101,7 +101,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc))
 
 	// Here you initialize your application with the store keys it requires
-	var app = &nameServiceApp{
+	var app = &tuckermintApp{
 		BaseApp: bApp,
 		cdc:     cdc,
 
@@ -136,7 +136,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 
 	// The NameserviceKeeper is the Keeper from the module for this tutorial
 	// It handles interactions with the namestore
-	app.nsKeeper = nameservice.NewKeeper(
+	app.nsKeeper = tuckermint.NewKeeper(
 		app.bankKeeper,
 		app.keyNS,
 		app.cdc,
@@ -146,14 +146,14 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountKeeper, app.feeCollectionKeeper))
 
 	// The app.Router is the main transaction router where each module registers its routes
-	// Register the bank and nameservice routes here
+	// Register the bank and tuckermint routes here
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.bankKeeper)).
-		AddRoute("nameservice", nameservice.NewHandler(app.nsKeeper))
+		AddRoute("tuckermint", tuckermint.NewHandler(app.nsKeeper))
 
 	// The app.QueryRouter is the main query router where each module registers its routes
 	app.QueryRouter().
-		AddRoute("nameservice", nameservice.NewQuerier(app.nsKeeper)).
+		AddRoute("tuckermint", tuckermint.NewQuerier(app.nsKeeper)).
 		AddRoute("acc", auth.NewQuerier(app.accountKeeper))
 
 	// The initChainer handles translating the genesis.json file into initial state for the network
@@ -191,7 +191,7 @@ type GenesisState struct {
 	Accounts []*auth.BaseAccount `json:"accounts"`
 }
 
-func (app *nameServiceApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *tuckermintApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
 	genesisState := new(GenesisState)
@@ -212,7 +212,7 @@ func (app *nameServiceApp) initChainer(ctx sdk.Context, req abci.RequestInitChai
 }
 
 // ExportAppStateAndValidators does the things
-func (app *nameServiceApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *tuckermintApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{})
 	accounts := []*auth.BaseAccount{}
 
@@ -251,7 +251,7 @@ func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
 	auth.RegisterCodec(cdc)
 	bank.RegisterCodec(cdc)
-	nameservice.RegisterCodec(cdc)
+	tuckermint.RegisterCodec(cdc)
 	staking.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)

@@ -2,11 +2,11 @@
 
 Your module can also expose a REST interface to allow programatic access to the module's functionality. To get started create a file to hold the HTTP handlers:
 
-- `./x/nameservice/client/rest/rest.go`
+- `./x/tuckermint/client/rest/rest.go`
 
 Add in the `imports` and `const`s to get started:
 
-> _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial/x/nameservice`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }/x/nameservice`).
+> _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial/x/tuckermint`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }/x/tuckermint`).
 
 ```go
 package rest
@@ -16,7 +16,7 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice/types"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -233,4 +233,4 @@ Notes on the above code:
 - The [`BaseReq`](https://godoc.org/github.com/cosmos/cosmos-sdk/client/utils#BaseReq) contains the basic required fields for making a transaction (which key to use, how to decode it, which chain you are on, etc...) and is designed to be embedded as shown.
 - `baseReq.ValidateBasic` handles setting the response code for you and therefore you don't need to worry about handling errors or successes when using those functions.
 
-### Next its time to augment `nameservice` by implementing the [AppModule interface](./module.md)!
+### Next its time to augment `tuckermint` by implementing the [AppModule interface](./module.md)!

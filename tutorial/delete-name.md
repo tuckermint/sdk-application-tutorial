@@ -2,7 +2,7 @@
 
 ## Msg
 
-Now it is time to define the `Msg` for deleting names and add it to the `./x/nameservice/types/msgs.go` file. This code is very similar to `SetName`:
+Now it is time to define the `Msg` for deleting names and add it to the `./x/tuckermint/types/msgs.go` file. This code is very similar to `SetName`:
 
 ```go
 // MsgDeleteName defines a DeleteName message
@@ -47,10 +47,10 @@ func (msg MsgDeleteName) GetSigners() []sdk.AccAddress {
 }
 ```
 
-Next, in the `./x/nameservice/handler.go` file, add the `MsgDeleteName` handler to the module router:
+Next, in the `./x/tuckermint/handler.go` file, add the `MsgDeleteName` handler to the module router:
 
 ```go
-// NewHandler returns a handler for "nameservice" type messages.
+// NewHandler returns a handler for "tuckermint" type messages.
 func NewHandler(keeper Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
@@ -61,7 +61,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 		case MsgDeleteName:
 			return handleMsgDeleteName(ctx, keeper, msg)
 		default:
-			errMsg := fmt.Sprintf("Unrecognized nameservice Msg type: %v", msg.Type())
+			errMsg := fmt.Sprintf("Unrecognized tuckermint Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}

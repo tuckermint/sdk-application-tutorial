@@ -1,8 +1,8 @@
 # Import your modules and finish your application
 
-Now that your module is ready, it can be incorporated in the `./app.go` file, along with the other two modules [`auth`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/auth) and [`bank`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/bank). Let's begin by adding your new nameservice module to the imports:
+Now that your module is ready, it can be incorporated in the `./app.go` file, along with the other two modules [`auth`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/auth) and [`bank`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/bank). Let's begin by adding your new tuckermint module to the imports:
 
-> _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial/x/nameservice`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }/x/nameservice`).
+> _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial/x/tuckermint`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }/x/tuckermint`).
 
 ```go
 package app
@@ -31,17 +31,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint"
 )
 
-const appName = "nameservice"
+const appName = "tuckermint"
 
 var (
 	// default home directories for the application CLI
-	DefaultCLIHome = os.ExpandEnv("$HOME/.nscli")
+	DefaultCLIHome = os.ExpandEnv("$HOME/.tmcli")
 
 	// DefaultNodeHome sets the folder where the applcation data and configuration will be stored
-	DefaultNodeHome = os.ExpandEnv("$HOME/.nsd")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.tmd")
 
 	// NewBasicManager is in charge of setting up basic module elemnets
 	ModuleBasics = module.NewBasicManager(
@@ -55,7 +55,7 @@ var (
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 
-		nameservice.AppModule{},
+		tuckermint.AppModule{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
@@ -67,11 +67,11 @@ var (
 )
 ```
 
-Next you need to add the stores' keys and the `Keepers` into your `nameServiceApp` struct.
+Next you need to add the stores' keys and the `Keepers` into your `tuckermintApp` struct.
 
 ```go
 
-type nameServiceApp struct {
+type tuckermintApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
@@ -87,14 +87,14 @@ type nameServiceApp struct {
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
-	nsKeeper       nameservice.Keeper
+	nsKeeper       tuckermint.Keeper
 
 	// Module Manager
 	mm *module.Manager
 }
 
-// NewNameServiceApp is a constructor function for nameServiceApp
-func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
+// NewTuckermintApp is a constructor function for tuckermintApp
+func NewTuckermintApp(logger log.Logger, db dbm.DB) *tuckermintApp {
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -107,7 +107,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	// Here you initialize your application with the store keys it requires
-	var app = &nameServiceApp{
+	var app = &tuckermintApp{
 		BaseApp: bApp,
 		cdc:     cdc,
 		keys:    keys,
@@ -128,8 +128,8 @@ At this point, the constructor still lacks important logic. Namely, it needs to:
 Your finalized constructor should look like this:
 
 ```go
-// NewNameServiceApp is a constructor function for nameServiceApp
-func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
+// NewTuckermintApp is a constructor function for tuckermintApp
+func NewTuckermintApp(logger log.Logger, db dbm.DB) *tuckermintApp {
 
 		// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -142,7 +142,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	// Here you initialize your application with the store keys it requires
-	var app = &nameServiceApp{
+	var app = &tuckermintApp{
 		BaseApp: bApp,
 		cdc:     cdc,
 		keys:    keys,
@@ -222,9 +222,9 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 
 	// The NameserviceKeeper is the Keeper from the module for this tutorial
 	// It handles interactions with the namestore
-	app.nsKeeper = nameservice.NewKeeper(
+	app.nsKeeper = tuckermint.NewKeeper(
 		app.bankKeeper,
-		keys[nameservice.StoreKey],
+		keys[tuckermint.StoreKey],
 		app.cdc,
 	)
 
@@ -233,7 +233,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		nameservice.NewAppModule(app.nsKeeper, app.bankKeeper),
+		tuckermint.NewAppModule(app.nsKeeper, app.bankKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
@@ -251,7 +251,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 		auth.ModuleName,
 		bank.ModuleName,
 		slashing.ModuleName,
-		nameservice.ModuleName,
+		tuckermint.ModuleName,
 		genutil.ModuleName,
 	)
 
@@ -301,7 +301,7 @@ func NewDefaultGenesisState() GenesisState {
 	return ModuleBasics.DefaultGenesis()
 }
 
-func (app *nameServiceApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *tuckermintApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 
 	err := app.cdc.UnmarshalJSON(req.AppStateBytes, &genesisState)
@@ -312,20 +312,20 @@ func (app *nameServiceApp) InitChainer(ctx sdk.Context, req abci.RequestInitChai
 	return app.mm.InitGenesis(ctx, genesisState)
 }
 
-func (app *nameServiceApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *tuckermintApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
-func (app *nameServiceApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *tuckermintApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
-func (app *nameServiceApp) LoadHeight(height int64) error {
+func (app *tuckermintApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *nameServiceApp) ModuleAccountAddrs() map[string]bool {
+func (app *tuckermintApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
@@ -336,7 +336,7 @@ func (app *nameServiceApp) ModuleAccountAddrs() map[string]bool {
 
 //_________________________________________________________
 
-func (app *nameServiceApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
+func (app *tuckermintApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
 ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block

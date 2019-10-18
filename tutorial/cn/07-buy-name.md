@@ -2,7 +2,7 @@
 
 ## `Msg`
 
-现在来定义购买域名的`Msg`，并加在`./x/nameservice/msgs.go`文件中。代码同`SetName`非常相似：
+现在来定义购买域名的`Msg`，并加在`./x/tuckermint/msgs.go`文件中。代码同`SetName`非常相似：
 
 ```go
 // MsgBuyName defines the BuyName message
@@ -22,7 +22,7 @@ func NewMsgBuyName(name string, bid sdk.Coins, buyer sdk.AccAddress) MsgBuyName 
 }
 
 // Route should return the name of the module
-func (msg MsgBuyName) Route() string { return "nameservice" }
+func (msg MsgBuyName) Route() string { return "tuckermint" }
 
 // Type should return the action
 func (msg MsgBuyName) Type() string { return "buy_name" }
@@ -56,10 +56,10 @@ func (msg MsgBuyName) GetSigners() []sdk.AccAddress {
 }
 ```
 
-接着，在`./x/nameservice/handler.go`文件中，把`MsgBuyName`加入到模块路由器中：
+接着，在`./x/tuckermint/handler.go`文件中，把`MsgBuyName`加入到模块路由器中：
 
 ```go
-// NewHandler returns a handler for "nameservice" type messages.
+// NewHandler returns a handler for "tuckermint" type messages.
 func NewHandler(keeper Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
@@ -68,7 +68,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 		case MsgBuyName:
 			return handleMsgBuyName(ctx, keeper, msg)
 		default:
-			errMsg := fmt.Sprintf("Unrecognized nameservice Msg type: %v", msg.Type())
+			errMsg := fmt.Sprintf("Unrecognized tuckermint Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}
@@ -102,7 +102,7 @@ func handleMsgBuyName(ctx sdk.Context, keeper Keeper, msg MsgBuyName) sdk.Result
 
 首先确保出价高于当前价格。然后，检查域名是否已有所有者。如果有，之前的所有者将会收到`Buyer`的钱。
 
-如果没有所有者，你的`nameservice`模块会把`Buyer`的资金“燃烧”（即发送到不可恢复的地址）。
+如果没有所有者，你的`tuckermint`模块会把`Buyer`的资金“燃烧”（即发送到不可恢复的地址）。
 
 如果`SubtractCoins`或`SendCoins`返回一个非空错误，handler会抛出一个错误，回退状态转变。没有的话，使用之前在`Keeper`上定义的 getter 和 setter，handler 将买方设置为新所有者，并将新价格设置为当前出价。
 

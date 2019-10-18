@@ -57,14 +57,14 @@ import (
 - 帮助初始化你的 state。
 - 帮助设置 queries。
 
-现在你需要为应用程序创建一个新的自定义类型`nameServiceApp`。这个类型将嵌入`baseapp`（在Go中的嵌入类似于其他语言中的继承），这意味着它可以访问`baseapp`的所有方法。
+现在你需要为应用程序创建一个新的自定义类型`tuckermintApp`。这个类型将嵌入`baseapp`（在Go中的嵌入类似于其他语言中的继承），这意味着它可以访问`baseapp`的所有方法。
 
 ```go
 const (
-    appName = "nameservice"
+    appName = "tuckermint"
 )
 
-type nameServiceApp struct {
+type tuckermintApp struct {
     *bam.BaseApp
 }
 ```
@@ -74,7 +74,7 @@ type nameServiceApp struct {
 为你的应用添加一个简单的构造函数:
 
 ```go
-func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
+func NewTuckermintApp(logger log.Logger, db dbm.DB) *tuckermintApp {
 
     // First define the top level codec that will be shared by the different modules. Note: Codec will be explained later
     cdc := MakeCodec()
@@ -82,7 +82,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
     // BaseApp handles interactions with Tendermint through the ABCI protocol
     bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc))
 
-    var app = &nameServiceApp{
+    var app = &tuckermintApp{
         BaseApp: bApp,
         cdc:     cdc,
     }
@@ -97,8 +97,8 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 
 `baseapp`不了解你要在应用程序中使用的路由或用户交互。应用程序的主要作用是定义这些路由。另一个作用是定义初始状态。这两件事都要求你向应用程序添加模块。
 
-正如你在应用[程序设计](./01-app-design.md)章节中看到的，你的nameservice需要三个模块：`auth`，`bank`和`nameservice`。前两个已经存在了，但最后一个还没有！`nameservice`模块将定义你的状态机的大部分内容。下一步是构建它。
+正如你在应用[程序设计](./01-app-design.md)章节中看到的，你的tuckermint需要三个模块：`auth`，`bank`和`tuckermint`。前两个已经存在了，但最后一个还没有！`tuckermint`模块将定义你的状态机的大部分内容。下一步是构建它。
 
-In order to complete your application, you need to include modules. Go ahead and [start building your nameservice module](types.md). You will come back to `app.go` later.
+In order to complete your application, you need to include modules. Go ahead and [start building your tuckermint module](types.md). You will come back to `app.go` later.
 
 ### 为了完成应用程序，你需要引入一些模块。 继续[开始构建你的域名服务模块](./03-types.md) 。 稍后会回到 app.go.

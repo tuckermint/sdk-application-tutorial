@@ -24,7 +24,7 @@ import (
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -73,17 +73,17 @@ Here is what `baseapp` does:
 - Help initialise your state.
 - Help set up queries.
 
-Now you need to create a new custom type `nameServiceApp` for your application. This type will embed `baseapp` (embedding in Go similar to inheritance in other languages), meaning it will have access to all of `baseapp`'s methods.
+Now you need to create a new custom type `tuckermintApp` for your application. This type will embed `baseapp` (embedding in Go similar to inheritance in other languages), meaning it will have access to all of `baseapp`'s methods.
 
 ```go
-const appName = "nameservice"
+const appName = "tuckermint"
 
 var (
 	// default home directories for the application CLI
-	DefaultCLIHome = os.ExpandEnv("$HOME/.nscli")
+	DefaultCLIHome = os.ExpandEnv("$HOME/.tmcli")
 
 	// DefaultNodeHome sets the folder where the applcation data and configuration will be stored
-	DefaultNodeHome = os.ExpandEnv("$HOME/.nsd")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.tmd")
 
 	// NewBasicManager is in charge of setting up basic module elemnets
 	ModuleBasics = module.NewBasicManager()
@@ -92,7 +92,7 @@ var (
 	maccPerms = map[string][]string{}
 )
 
-type nameServiceApp struct {
+type tuckermintApp struct {
     *bam.BaseApp
 }
 ```
@@ -100,7 +100,7 @@ type nameServiceApp struct {
 Add a simple constructor for your application:
 
 ```go
-func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
+func NewTuckermintApp(logger log.Logger, db dbm.DB) *tuckermintApp {
 
     // First define the top level codec that will be shared by the different modules. Note: Codec will be explained later
     cdc := MakeCodec()
@@ -108,7 +108,7 @@ func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
     // BaseApp handles interactions with Tendermint through the ABCI protocol
     bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc))
 
-    var app = &nameServiceApp{
+    var app = &tuckermintApp{
         BaseApp: bApp,
         cdc:     cdc,
     }
@@ -121,6 +121,6 @@ Great! You now have the skeleton of your application; however, it still lacks fu
 
 `baseapp` has no knowledge of the routes or user interactions you want to use in your application. The primary role of your application is to define these routes. Another role is to define the initial state. Both these things require that you add modules to your application.
 
-As you have seen in the [application design](./app-design.md) section, you need a couple modules for your nameservice: `auth`, `bank`, `staking`, `distribution`, `slashing` and `nameservice`. The first two already exist, but not the last! The `nameservice` module will define the bulk of your state machine. The next step is to build it.
+As you have seen in the [application design](./app-design.md) section, you need a couple modules for your tuckermint: `auth`, `bank`, `staking`, `distribution`, `slashing` and `tuckermint`. The first two already exist, but not the last! The `tuckermint` module will define the bulk of your state machine. The next step is to build it.
 
-### In order to complete your application, you need to include modules. Go ahead and [start building your nameservice module](types.md). You will come back to `app.go` later.
+### In order to complete your application, you need to include modules. Go ahead and [start building your tuckermint module](types.md). You will come back to `app.go` later.

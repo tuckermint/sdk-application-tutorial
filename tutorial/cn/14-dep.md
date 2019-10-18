@@ -10,8 +10,8 @@
 all: install
 
 install: go.sum
-	go install -tags "$(build_tags)" ./cmd/nsd
-	go install -tags "$(build_tags)" ./cmd/nscli
+	go install -tags "$(build_tags)" ./cmd/tmd
+	go install -tags "$(build_tags)" ./cmd/tmcli
 
 go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"
@@ -58,8 +58,8 @@ include Makefile.ledger
 all: install
 
 install: go.sum
-	GO111MODULE=1 go install -tags "$(build_tags)" ./cmd/nsd
-	GO111MODULE=1 go install -tags "$(build_tags)" ./cmd/nscli
+	GO111MODULE=1 go install -tags "$(build_tags)" ./cmd/tmd
+	GO111MODULE=1 go install -tags "$(build_tags)" ./cmd/tmcli
 
 go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"
@@ -146,8 +146,8 @@ replace golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-2018082004570
 make install
 
 # Now you should be able to run the following commands:
-nsd help
-nscli help
+tmd help
+tmcli help
 ```
 
 ### 恭喜，您已完成名称服务应用！ 尝试[运行并使用](./15-build-run.md)吧！

@@ -2,8 +2,8 @@
 
 The Cosmos SDK uses the [`cobra`](https://github.com/spf13/cobra) library for CLI interactions. This library makes it easy for each module to expose its own commands. To get started defining the user's CLI interactions with your module, create the following files:
 
-- `./x/nameservice/client/cli/query.go`
-- `./x/nameservice/client/cli/tx.go`
+- `./x/tuckermint/client/cli/query.go`
+- `./x/tuckermint/client/cli/tx.go`
 
 ## Queries
 
@@ -18,24 +18,24 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice/types"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint/types"
 	"github.com/spf13/cobra"
 )
 
 func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	nameserviceQueryCmd := &cobra.Command{
+	tuckermintQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Querying commands for the nameservice module",
+		Short:                      "Querying commands for the tuckermint module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	nameserviceQueryCmd.AddCommand(client.GetCommands(
+	tuckermintQueryCmd.AddCommand(client.GetCommands(
 		GetCmdResolveName(storeKey, cdc),
 		GetCmdWhois(storeKey, cdc),
 		GetCmdNames(storeKey, cdc),
 	)...)
-	return nameserviceQueryCmd
+	return tuckermintQueryCmd
 }
 
 // GetCmdResolveName queries information about a name
@@ -112,7 +112,7 @@ Notes on the above code:
 - The CLI introduces a new `context`: [`CLIContext`](https://godoc.org/github.com/cosmos/cosmos-sdk/client/context#CLIContext). It carries data about user input and application configuration that are needed for CLI interactions.
 - The `path` required for the `cliCtx.QueryWithData()` function maps directly to the names in your query router.
   - The first part of the path is used to differentiate the types of queries possible to SDK applications: `custom` is for `Queriers`.
-  - The second piece (`nameservice`) is the name of the module to route the query to.
+  - The second piece (`tuckermint`) is the name of the module to route the query to.
   - Finally there is the specific querier in the module that will be called.
   - In this example the fourth piece is the query. This works because the query parameter is a simple string. To enable more complex query inputs you need to use the second argument of the [`.QueryWithData()`](https://godoc.org/github.com/cosmos/cosmos-sdk/client/context#CLIContext.QueryWithData) function to pass in `data`. For an example of this see the [queriers in the Staking module](https://github.com/cosmos/cosmos-sdk/blob/develop/x/stake/querier/querier.go#L103).
 
@@ -120,7 +120,7 @@ Notes on the above code:
 
 Now that the query interactions are defined, it is time to move on to transaction generation in `tx.go`:
 
-> _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial/x/nameservice`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }/x/nameservice`).
+> _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial/x/tuckermint`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }/x/tuckermint`).
 
 ```go
 package cli
@@ -134,11 +134,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice/types"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint/types"
 )
 
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	nameserviceTxCmd := &cobra.Command{
+	tuckermintTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Nameservice transaction subcommands",
 		DisableFlagParsing:         true,
@@ -146,13 +146,13 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	nameserviceTxCmd.AddCommand(client.PostCommands(
+	tuckermintTxCmd.AddCommand(client.PostCommands(
 		GetCmdBuyName(cdc),
 		GetCmdSetName(cdc),
 		GetCmdDeleteName(cdc),
 	)...)
 
-	return nameserviceTxCmd
+	return tuckermintTxCmd
 }
 
 // GetCmdBuyName is the CLI command for sending a BuyName transaction

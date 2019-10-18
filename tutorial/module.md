@@ -1,13 +1,13 @@
 # AppModule Interface
 
-The Cosmos SDK provides a standard interface for modules. This [`AppModule`](https://github.com/cosmos/cosmos-sdk/blob/master/types/module.go) interface requires modules to provide a set of methods used by the `ModuleBasicsManager` to incorporate them into your application. First we will scaffold out the interface and implement **some** of its methods. Then we will incorporate our nameservice module alongside `auth` and `bank` into our app.
+The Cosmos SDK provides a standard interface for modules. This [`AppModule`](https://github.com/cosmos/cosmos-sdk/blob/master/types/module.go) interface requires modules to provide a set of methods used by the `ModuleBasicsManager` to incorporate them into your application. First we will scaffold out the interface and implement **some** of its methods. Then we will incorporate our tuckermint module alongside `auth` and `bank` into our app.
 
 Start by opening two new files, `module.go` and `genesis.go`. We will implement the AppModule interface in `module.go` and the functions specific to genesis state management in `genesis.go`. The genesis-specific methods on your AppModule struct will be pass-though calls to those defined in `genesis.go`.
 
 Lets start with adding the following code to `module.go`. We will leave a number of the functions unimplemented for now.
 
 ```go
-package nameservice
+package tuckermint
 
 import (
 	"encoding/json"
@@ -18,8 +18,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice/client/cli"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice/client/rest"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint/client/cli"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint/client/rest"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"

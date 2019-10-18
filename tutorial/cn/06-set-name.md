@@ -2,10 +2,10 @@
 
 ## `Msg`
 
-SDK中`Msg`的命令约束是 `Msg{.Action}`。要实现的第一个操作是`SetName`，因此命名为`MsgSetName`。此`Msg`允许域名的所有者设置该域名的解析返回值。首先在名为`./x/nameservice/msgs.go`的新文件中定义`MsgSetName`：
+SDK中`Msg`的命令约束是 `Msg{.Action}`。要实现的第一个操作是`SetName`，因此命名为`MsgSetName`。此`Msg`允许域名的所有者设置该域名的解析返回值。首先在名为`./x/tuckermint/msgs.go`的新文件中定义`MsgSetName`：
 
 ```go
-package nameservice
+package tuckermint
 
 import (
 	"encoding/json"
@@ -40,7 +40,7 @@ func NewMsgSetName(name string, value string, owner sdk.AccAddress) MsgSetName {
 
 ```go
 // Route should return the name of the module
-func (msg MsgSetName) Route() string { return "nameservice" }
+func (msg MsgSetName) Route() string { return "tuckermint" }
 
 // Type should return the action
 func (msg MsgSetName) Type() string { return "set_name"}
@@ -89,10 +89,10 @@ func (msg MsgSetName) GetSigners() []sdk.AccAddress {
 
 现在`MsgSetName`已经定义好了，下一部来定义收到此Msg时需要采取的操作。也就是`handler`所要做的。
 
-在一个新文件(`./x/nameservice/handler.go`)先写入如下代码：
+在一个新文件(`./x/tuckermint/handler.go`)先写入如下代码：
 
 ```go
-package nameservice
+package tuckermint
 
 import (
 	"fmt"
@@ -100,14 +100,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewHandler returns a handler for "nameservice" type messages.
+// NewHandler returns a handler for "tuckermint" type messages.
 func NewHandler(keeper Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case MsgSetName:
 			return handleMsgSetName(ctx, keeper, msg)
 		default:
-			errMsg := fmt.Sprintf("Unrecognized nameservice Msg type: %v", msg.Type())
+			errMsg := fmt.Sprintf("Unrecognized tuckermint Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}

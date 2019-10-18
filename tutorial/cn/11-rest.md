@@ -1,12 +1,12 @@
-# NameService 模块的 REST 接口
+# Tuckermint 模块的 REST 接口
 
 你的模块还可以公开 REST 接口，提供程序访问模块的功能。。首先创建一个文件来保存HTTP的handler：
 
-- `./x/nameservice/client/rest/rest.go`
+- `./x/tuckermint/client/rest/rest.go`
 
 引入模块和定义常量：
 
-> 你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（github.com/tuckermint/sdk-application-tutorial/x/nameservice）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}/x/nameservice）。
+> 你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（github.com/tuckermint/sdk-application-tutorial/x/tuckermint）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}/x/tuckermint）。
 
 ```go
 package rest
@@ -20,7 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint"
 
 	"github.com/gorilla/mux"
 )
@@ -136,7 +136,7 @@ func buyNameHandler(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFun
 		}
 
 		// create the message
-		msg := nameservice.NewMsgBuyName(req.Name, coins, addr)
+		msg := tuckermint.NewMsgBuyName(req.Name, coins, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -173,7 +173,7 @@ func setNameHandler(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFun
 		}
 
 		// create the message
-		msg := nameservice.NewMsgSetName(req.Name, req.Value, addr)
+		msg := tuckermint.NewMsgSetName(req.Name, req.Value, addr)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

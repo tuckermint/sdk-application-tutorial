@@ -10,8 +10,8 @@ Help users build your application by writing a `./Makefile` in the root director
 all: lint install
 
 install: go.sum
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/nsd
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/nscli
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/tmd
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/tmcli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
@@ -65,9 +65,9 @@ PACKAGES=$(shell go list ./... | grep -v '/simulation')
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=NameService \
-	-X github.com/cosmos/cosmos-sdk/version.ServerName=nsd \
-	-X github.com/cosmos/cosmos-sdk/version.ClientName=nscli \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=Tuckermint \
+	-X github.com/cosmos/cosmos-sdk/version.ServerName=tmd \
+	-X github.com/cosmos/cosmos-sdk/version.ClientName=tmcli \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 	-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags)"
@@ -78,8 +78,8 @@ include Makefile.ledger
 all: lint install
 
 install: go.sum
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/nsd
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/nscli
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/tmd
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/tmcli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
@@ -121,8 +121,8 @@ require (
 make install
 
 # Now you should be able to run the following commands:
-nsd help
-nscli help
+tmd help
+tmcli help
 ```
 
-### Congratulations, you have finished your nameservice application! Try [running and interacting with it](./build-run.md)!
+### Congratulations, you have finished your tuckermint application! Try [running and interacting with it](./build-run.md)!

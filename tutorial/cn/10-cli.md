@@ -2,9 +2,9 @@
 
 Cosmos SDK使用[`cobra`](https://github.com/spf13/cobra)库进行CLI交互。该库使每个模块都可以轻松地显示自己的操作命令。要开始定义用户与模块的CLI交互，请创建以下文件：
 
-- `./x/nameservice/client/cli/query.go`
-- `./x/nameservice/client/cli/tx.go`
-- `./x/nameservice/client/module_client.go`
+- `./x/tuckermint/client/cli/query.go`
+- `./x/tuckermint/client/cli/tx.go`
+- `./x/tuckermint/client/module_client.go`
 
 ### ## Queries
 
@@ -18,7 +18,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +38,7 @@ func GetCmdResolveName(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 
-			var out nameservice.QueryResResolve
+			var out tuckermint.QueryResResolve
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},
@@ -61,7 +61,7 @@ func GetCmdWhois(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 
-			var out nameservice.Whois
+			var out tuckermint.Whois
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},
@@ -83,7 +83,7 @@ func GetCmdNames(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 
-			var out nameservice.QueryResNames
+			var out tuckermint.QueryResNames
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},
@@ -100,7 +100,7 @@ func GetCmdNames(queryRoute string, cdc *codec.Codec) *cobra.Command {
 - `cliCtx.QueryWithData()`函数所需的`path`直接从你的查询路径中映射。
 
   - 路径的第一部分用于区分 SDK 应用程序可能的querier类型：`custom`用于`Querier`
-  - 第二部分（`nameservice`）是将查询路由到的模块的名称。
+  - 第二部分（`tuckermint`）是将查询路由到的模块的名称。
   - 最后是要调用模块中的特定的querier。
   - 在这个例子中，第四部分是查询。这是因为查询参数是一个简单的字符串。要启用更复杂的查询输入，你需要使用[`.QueryWithData()`](https://godoc.org/github.com/cosmos/cosmos-sdk/client/context#CLIContext.QueryWithData)函数的第二个参数来传入`data`。有关此示例，请参阅 [Staking 模块中的 queriers](https://github.com/cosmos/cosmos-sdk/blob/develop/x/stake/querier/querier.go#L103)。
 
@@ -110,7 +110,7 @@ func GetCmdNames(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 现在已经定义了查询交互，是时候继续在`tx.go`中的交易生成了：
 
-> 你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（github.com/tuckermint/sdk-application-tutorial/x/nameservice）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}/x/nameservice）。
+> 你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（github.com/tuckermint/sdk-application-tutorial/x/tuckermint）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}/x/tuckermint）。
 
 ```go
 package cli
@@ -121,7 +121,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
+	"github.com/tuckermint/sdk-application-tutorial/x/tuckermint"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
@@ -147,7 +147,7 @@ func GetCmdBuyName(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := nameservice.NewMsgBuyName(args[0], coins, cliCtx.GetFromAddress())
+			msg := tuckermint.NewMsgBuyName(args[0], coins, cliCtx.GetFromAddress())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -175,7 +175,7 @@ func GetCmdSetName(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := nameservice.NewMsgSetName(args[0], args[1], cliCtx.GetFromAddress())
+			msg := tuckermint.NewMsgSetName(args[0], args[1], cliCtx.GetFromAddress())
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -197,16 +197,16 @@ func GetCmdSetName(cdc *codec.Codec) *cobra.Command {
 
 ## Module Client
 
-导出此功能的最后一部分称为`ModuleClient`，在`./x/nameservice/client/module_client.go`文件中实现。[Module Client](https://godoc.org/github.com/cosmos/cosmos-sdk/types#ModuleClients) 为模块提供了导出客户端功能的标准方法。
+导出此功能的最后一部分称为`ModuleClient`，在`./x/tuckermint/client/module_client.go`文件中实现。[Module Client](https://godoc.org/github.com/cosmos/cosmos-sdk/types#ModuleClients) 为模块提供了导出客户端功能的标准方法。
 
-> 注意：你的应用程序需要导入你刚编写的代码。这里导入路径设置为此仓库（github.com/tuckermint/sdk-application-tutorial/x/nameservice）。如果你是在自己项目中编写的，则需要更改导入路径成（github.com/{.Username}/ {.Project.Repo}/x/nameservice）。
+> 注意：你的应用程序需要导入你刚编写的代码。这里导入路径设置为此仓库（github.com/tuckermint/sdk-application-tutorial/x/tuckermint）。如果你是在自己项目中编写的，则需要更改导入路径成（github.com/{.Username}/ {.Project.Repo}/x/tuckermint）。
 
 ```go
 package client
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
-	nameservicecmd "github.com/tuckermint/sdk-application-tutorial/x/nameservice/client/cli"
+	tuckermintcmd "github.com/tuckermint/sdk-application-tutorial/x/tuckermint/client/cli"
 	"github.com/spf13/cobra"
 	amino "github.com/tendermint/go-amino"
 )
@@ -223,15 +223,15 @@ func NewModuleClient(storeKey string, cdc *amino.Codec) ModuleClient {
 
 // GetQueryCmd returns the cli query commands for this module
 func (mc ModuleClient) GetQueryCmd() *cobra.Command {
-	// Group nameservice queries under a subcommand
+	// Group tuckermint queries under a subcommand
 	namesvcQueryCmd := &cobra.Command{
-		Use:   "nameservice",
-		Short: "Querying commands for the nameservice module",
+		Use:   "tuckermint",
+		Short: "Querying commands for the tuckermint module",
 	}
 
 	namesvcQueryCmd.AddCommand(client.GetCommands(
-		nameservicecmd.GetCmdResolveName(mc.storeKey, mc.cdc),
-		nameservicecmd.GetCmdWhois(mc.storeKey, mc.cdc),
+		tuckermintcmd.GetCmdResolveName(mc.storeKey, mc.cdc),
+		tuckermintcmd.GetCmdWhois(mc.storeKey, mc.cdc),
 	)...)
 
 	return namesvcQueryCmd
@@ -240,13 +240,13 @@ func (mc ModuleClient) GetQueryCmd() *cobra.Command {
 // GetTxCmd returns the transaction commands for this module
 func (mc ModuleClient) GetTxCmd() *cobra.Command {
 	namesvcTxCmd := &cobra.Command{
-		Use:   "nameservice",
+		Use:   "tuckermint",
 		Short: "Nameservice transactions subcommands",
 	}
 
 	namesvcTxCmd.AddCommand(client.PostCommands(
-		nameservicecmd.GetCmdBuyName(mc.cdc),
-		nameservicecmd.GetCmdSetName(mc.cdc),
+		tuckermintcmd.GetCmdBuyName(mc.cdc),
+		tuckermintcmd.GetCmdSetName(mc.cdc),
 	)...)
 
 	return namesvcTxCmd

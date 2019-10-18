@@ -2,10 +2,10 @@
 
 The AppModule interface includes a number of functions for use in initializing and exporting GenesisState for the chain. The `ModuleBasicManager` calls these functions on each module when starting, stopping or exporting the chain. Here is a very basic implementation that you can expand upon.
 
-Go to `x/nameservice/genesis.go` and add the following code:
+Go to `x/tuckermint/genesis.go` and add the following code:
 
 ```go
-package nameservice
+package tuckermint
 
 import (
 	"fmt"

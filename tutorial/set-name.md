@@ -2,7 +2,7 @@
 
 ## `Msg`
 
-The naming convention for the SDK `Msgs` is `Msg{ .Action }`. The first action to implement is `SetName`, so we'll call it `MsgSetName`. This `Msg` allows the owner of a name to set the return value for that name within the resolver. Start by defining `MsgSetName` in a new file called `./x/nameservice/types/msgs.go`:
+The naming convention for the SDK `Msgs` is `Msg{ .Action }`. The first action to implement is `SetName`, so we'll call it `MsgSetName`. This `Msg` allows the owner of a name to set the return value for that name within the resolver. Start by defining `MsgSetName` in a new file called `./x/tuckermint/types/msgs.go`:
 
 ```go
 package types
@@ -85,10 +85,10 @@ func (msg MsgSetName) GetSigners() []sdk.AccAddress {
 
 Now that `MsgSetName` is specified, the next step is to define what action(s) needs to be taken when this message is received. This is the role of the `handler`.
 
-In a new file (`./x/nameservice/handler.go`) start with the following code:
+In a new file (`./x/tuckermint/handler.go`) start with the following code:
 
 ```go
-package nameservice
+package tuckermint
 
 import (
 	"fmt"
@@ -96,14 +96,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// NewHandler returns a handler for "nameservice" type messages.
+// NewHandler returns a handler for "tuckermint" type messages.
 func NewHandler(keeper Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case MsgSetName:
 			return handleMsgSetName(ctx, keeper, msg)
 		default:
-			errMsg := fmt.Sprintf("Unrecognized nameservice Msg type: %v", msg.Type())
+			errMsg := fmt.Sprintf("Unrecognized tuckermint Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
 		}
 	}

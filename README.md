@@ -1,6 +1,6 @@
 # SDK Application Tutorial
 
-This repository contains the source code of the nameservice tutorial.
+This repository contains the source code of the tuckermint tutorial.
 
 ## Tutorial
 
