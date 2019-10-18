@@ -32,8 +32,8 @@ func main() {
 	config.Seal()
 
 	rootCmd := &cobra.Command{
-		Use:   "tuckermintcli",
-		Short: "Tuckermint Client",
+		Use:   "nscli",
+		Short: "nameservice Client",
 	}
 
 	// Add --chain-id to persistent flags and mark it required
@@ -57,7 +57,7 @@ func main() {
 		client.NewCompletionCmd(rootCmd, true),
 	)
 
-	executor := cli.PrepareMainCmd(rootCmd, "Tuckermint", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "NS", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)

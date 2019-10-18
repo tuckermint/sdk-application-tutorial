@@ -1,3 +1,10 @@
+# Import your modules and finish your application
+
+Now that your module is ready, it can be incorporated in the `./app.go` file, along with the other two modules [`auth`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/auth) and [`bank`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/bank). Let's begin by adding your new nameservice module to the imports:
+
+> _*NOTE*_: Your application needs to import the code you just wrote. Here the import path is set to this repository (`github.com/tuckermint/sdk-application-tutorial/x/nameservice`). If you are following along in your own repo you will need to change the import path to reflect that (`github.com/{ .Username }/{ .Project.Repo }/x/nameservice`).
+
+```go
 package app
 
 import (
@@ -14,9 +21,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	//"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genaccounts"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
@@ -25,7 +31,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
-        "github.com/tuckermint/sdk-application-tutorial/x/superbank"
+	"github.com/tuckermint/sdk-application-tutorial/x/nameservice"
 )
 
 const appName = "nameservice"
@@ -42,13 +48,14 @@ var (
 		genaccounts.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
-		//bank.AppModuleBasic{},
-                superbank.AppModuleBasic{},
+		bank.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		params.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
+
+		nameservice.AppModule{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
@@ -58,15 +65,11 @@ var (
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 	}
 )
+```
 
-// MakeCodec generates the necessary codecs for Amino
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	ModuleBasics.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	return cdc
-}
+Next you need to add the stores' keys and the `Keepers` into your `nameServiceApp` struct.
+
+```go
 
 type nameServiceApp struct {
 	*bam.BaseApp
@@ -78,23 +81,20 @@ type nameServiceApp struct {
 
 	// Keepers
 	accountKeeper  auth.AccountKeeper
-	//bankKeeper     bank.Keeper
-        bankKeeper     superbank.Keeper
+	bankKeeper     bank.Keeper
 	stakingKeeper  staking.Keeper
 	slashingKeeper slashing.Keeper
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
-        banklessSupplyKeeper supply.Keeper
 	paramsKeeper   params.Keeper
+	nsKeeper       nameservice.Keeper
 
 	// Module Manager
 	mm *module.Manager
 }
 
 // NewNameServiceApp is a constructor function for nameServiceApp
-func NewNameServiceApp(
-	logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp),
-) *nameServiceApp {
+func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
@@ -102,11 +102,43 @@ func NewNameServiceApp(
 	// BaseApp handles interactions with Tendermint through the ABCI protocol
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 
-	bApp.SetAppVersion(version.Version)
+	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey)
+	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
+
+	// Here you initialize your application with the store keys it requires
+	var app = &nameServiceApp{
+		BaseApp: bApp,
+		cdc:     cdc,
+		keys:    keys,
+		tkeys:   tkeys,
+	}
+}
+```
+
+At this point, the constructor still lacks important logic. Namely, it needs to:
+
+- Instantiate required `Keepers` from each desired module.
+- Generate `storeKeys` required by each `Keeper`.
+- Register `Handler`s from each module. The `AddRoute()` method from `baseapp`'s `router` is used to this end.
+- Register `Querier`s from each module. The `AddRoute()` method from `baseapp`'s `queryRouter` is used to this end.
+- Mount `KVStore`s to the provided keys in the `baseApp` multistore.
+- Set the `initChainer` for defining the initial application state.
+
+Your finalized constructor should look like this:
+
+```go
+// NewNameServiceApp is a constructor function for nameServiceApp
+func NewNameServiceApp(logger log.Logger, db dbm.DB) *nameServiceApp {
+
+		// First define the top level codec that will be shared by the different modules
+	cdc := MakeCodec()
+
+	// BaseApp handles interactions with Tendermint through the ABCI protocol
+	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey)
-
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	// Here you initialize your application with the store keys it requires
@@ -118,11 +150,10 @@ func NewNameServiceApp(
 	}
 
 	// The ParamsKeeper handles parameter storage for the application
-	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
+	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams, app.tkeyParams, params.DefaultCodespace)
 	// Set specific supspaces
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
-	//bankSupspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
-	bankSupspace := app.paramsKeeper.Subspace(superbank.DefaultParamspace)
+	bankSupspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
 	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
 	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
 	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
@@ -136,28 +167,10 @@ func NewNameServiceApp(
 	)
 
 	// The BankKeeper allows you perform sdk.Coins interactions
-        /*
 	app.bankKeeper = bank.NewBaseKeeper(
 		app.accountKeeper,
 		bankSupspace,
 		bank.DefaultCodespace,
-		app.ModuleAccountAddrs(),
-	)*/
-
-
-        app.banklessSupplyKeeper = supply.NewKeeper(
-		app.cdc,
-		keys[supply.StoreKey],
-		app.accountKeeper,
-		nil,
-		maccPerms,
-	)
-
-	app.bankKeeper = superbank.NewBaseKeeper(
-		app.accountKeeper,
-                app.banklessSupplyKeeper,
-		bankSupspace,
-		superbank.DefaultCodespace,
 		app.ModuleAccountAddrs(),
 	)
 
@@ -207,15 +220,21 @@ func NewNameServiceApp(
 			app.slashingKeeper.Hooks()),
 	)
 
+	// The NameserviceKeeper is the Keeper from the module for this tutorial
+	// It handles interactions with the namestore
+	app.nsKeeper = nameservice.NewKeeper(
+		app.bankKeeper,
+		keys[nameservice.StoreKey],
+		app.cdc,
+	)
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
-		superbank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		//bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+		nameservice.NewAppModule(app.nsKeeper, app.bankKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
-                supply.NewAppModule(app.banklessSupplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
@@ -225,17 +244,14 @@ func NewNameServiceApp(
 	app.mm.SetOrderEndBlockers(staking.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
-	// NOTE: The genutils moodule must occur after staking so that pools are
-	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
 		genaccounts.ModuleName,
 		distr.ModuleName,
 		staking.ModuleName,
 		auth.ModuleName,
-                superbank.ModuleName,
-		//bank.ModuleName,
+		bank.ModuleName,
 		slashing.ModuleName,
-		supply.ModuleName,
+		nameservice.ModuleName,
 		genutil.ModuleName,
 	)
 
@@ -267,7 +283,17 @@ func NewNameServiceApp(
 
 	return app
 }
+```
 
+> _*NOTE*_: The TransientStore mentioned above is an in-memory implementation of the KVStore for state that is not persisted.
+
+> _*NOTE*_: Pay attention to how the modules are initiated: the order matters! Here the sequence goes Auth --> Bank --> Feecollection --> Staking --> Distribution --> Slashing, then the hooks were set for the staking module. This is because some of these modules depend on others existing before they can be used.
+
+The `initChainer` defines how accounts in `genesis.json` are mapped into the application state on initial chain start. The `ExportAppStateAndValidators` function helps bootstrap the initial state for the application. You don't need to worry too much about either of these for now. We also need to add a few more methods to our app `BeginBlocker`, `EndBlocker` and `LoadHeight`.
+
+The constructor registers the `initChainer` function, but it isn't defined yet. Go ahead and create it:
+
+```go
 // GenesisState represents chain state at the start of the chain. Any initial state (account balances) are stored here.
 type GenesisState map[string]json.RawMessage
 
@@ -289,9 +315,11 @@ func (app *nameServiceApp) InitChainer(ctx sdk.Context, req abci.RequestInitChai
 func (app *nameServiceApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
+
 func (app *nameServiceApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
+
 func (app *nameServiceApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
@@ -324,3 +352,19 @@ func (app *nameServiceApp) ExportAppStateAndValidators(forZeroHeight bool, jailW
 
 	return appState, validators, nil
 }
+```
+
+Finally add a helper function to generate an amino [`*codec.Codec`](https://godoc.org/github.com/cosmos/cosmos-sdk/codec#Codec) that properly registers all of the modules used in your application:
+
+```go
+// MakeCodec generates the necessary codecs for Amino
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	ModuleBasics.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	return cdc
+}
+```
+
+### Now that you have created an application that includes your module, it's time to [build your entrypoints](entrypoint.md)!
