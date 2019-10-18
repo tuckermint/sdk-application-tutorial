@@ -321,13 +321,13 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
             fmt.Println("Amount: ", amountInt)
             fmt.Println("---")
 	}
-        
+
 
         // Tuck Centralization Defense Active
         // n squared but everyone sends only one coin anyway
         // I will use a map if it's slow
-        
-        /*if len(amt) > 0 {        
+
+        if len(amt) > 0 {
 		cutoff := float64(0.01)
 		totalSupply := keeper.sk.GetSupply(ctx).GetTotal()
 
@@ -347,15 +347,18 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
 			    percentControlled := float64(amountInt.Int64()) / float64(supplyInt.Int64())
 			    isOnePercenter := percentControlled > cutoff
 			    if isOnePercenter{
-				return sdk.ErrInvalidCoins(amt.String())
+				if supplyInt.Int64() < 1000000000 {
+                                    fmt.Println("One percenter detected, but supply is too low to care.")
+				} else {
+				    return sdk.ErrInvalidCoins(amt.String())
+			        }
 			    }
 			    break;
 			}
 		    }
 		}
-        }*/
-        
-        
+        }
+
 	err := acc.SetCoins(amt)
 	if err != nil {
 		panic(err)
