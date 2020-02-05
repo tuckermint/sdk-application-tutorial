@@ -41,7 +41,7 @@ func NewBaseKeeper(
 
 	ps := paramSpace.WithKeyTable(types.ParamKeyTable())
 	return BaseKeeper{
-		BaseSendKeeper: NewBaseSendKeeper(ak, ps, blacklistedAddrs),
+		BaseSendKeeper: NewBaseSendKeeper(ak, sk, ps, blacklistedAddrs),
 		ak:             ak,
 		sk:             sk,
 		paramSpace:     ps,
@@ -339,7 +339,7 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
 
                         if amountDenom == supplyDenom {
                             if supplyInt.IsZero() {
-                                return sdk.ErrInvalidCoins(amt.String())  // this coin has no supply
+                                sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, amt.String()) // this coin has no supply
                             }
 
                             percentControlled := float64(amountInt.Int64()) / float64(supplyInt.Int64())
@@ -348,7 +348,7 @@ func (keeper BaseSendKeeper) SetCoins(ctx sdk.Context, addr sdk.AccAddress, amt 
                                 if supplyInt.Int64() < 1000000000 {
                                     fmt.Println("One percenter detected, but supply is too low to care.")
                                 } else {
-                                    return sdk.ErrInvalidCoins(amt.String())
+                                    sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, amt.String()) // one percenter thwarted
                                 }
                             }
                             break;
