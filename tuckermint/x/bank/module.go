@@ -14,11 +14,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/tuckermint/sdk-tutorials/x/bank/client/cli"
-	"github.com/tuckermint/sdk-tutorials/x/bank/client/rest"
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/keeper"
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
-	"github.com/tuckermint/sdk-tutorials/x/bank/simulation"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/client/cli"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/client/rest"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/keeper"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/simulation"
 	sim "github.com/cosmos/cosmos-sdk/x/simulation"
 )
 

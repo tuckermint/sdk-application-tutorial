@@ -16,7 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
 )
 
 type (

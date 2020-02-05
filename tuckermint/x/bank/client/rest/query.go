@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
 )
 
 // query accountREST Handler

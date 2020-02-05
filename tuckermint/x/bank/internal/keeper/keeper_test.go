@@ -13,8 +13,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
-	keep "github.com/tuckermint/sdk-tutorials/x/bank/internal/keeper"
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
+	keep "github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/keeper"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 )
 

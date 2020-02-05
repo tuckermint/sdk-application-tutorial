@@ -10,7 +10,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 	vestexported "github.com/cosmos/cosmos-sdk/x/auth/vesting/exported"
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 )
 

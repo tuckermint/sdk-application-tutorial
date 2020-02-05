@@ -10,8 +10,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	keep "github.com/tuckermint/sdk-tutorials/x/bank/internal/keeper"
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
+	keep "github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/keeper"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
 )
 
 func TestBalances(t *testing.T) {

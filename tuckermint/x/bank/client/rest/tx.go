@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
 )
 
 // RegisterRoutes - Central function to define routes that get registered by the main application

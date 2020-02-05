@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 )
 

@@ -3,8 +3,8 @@ package bank
 // nolint
 
 import (
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/keeper"
-	"github.com/tuckermint/sdk-tutorials/x/bank/internal/types"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/keeper"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank/internal/types"
 )
 
 const (
