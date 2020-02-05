@@ -105,6 +105,6 @@ If there is no owner, your `tuckermint` module "burns" (i.e. sends to an unrecov
 
 If either `SubtractCoins` or `SendCoins` returns a non-nil error, the handler throws an error, reverting the state transition. Otherwise, using the getters and setters defined on the `Keeper` earlier, the handler sets the buyer to the new owner and sets the new price to be the current bid.
 
-> _*NOTE*_: This handler uses functions from the `coinKeeper` to perform currency operations. If your application is performing currency operations you may want to take a look at the [godocs for this module](https://godoc.org/github.com/tuckermint/sdk-tutorials/x/bank#BaseKeeper) to see what functions it exposes.
+> _*NOTE*_: This handler uses functions from the `coinKeeper` to perform currency operations. If your application is performing currency operations you may want to take a look at the [godocs for this module](https://godoc.org/github.com/tuckermint/sdk-tutorials/tuckermint/x/bank#BaseKeeper) to see what functions it exposes.
 
 ### Great, now owners can `BuyName`s! But what if they don't want the name any longer? Your module needs a way for users to delete names! Let us define define the `DeleteName` message.

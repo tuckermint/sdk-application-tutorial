@@ -14,7 +14,7 @@ package tuckermint
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tuckermint/sdk-tutorials/x/bank"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank"
 	"github.com/tuckermint/sdk-tutorials/tuckermint/x/tuckermint/types"
 )
 
@@ -34,10 +34,10 @@ type Keeper struct {
 
 - 3个不同的`cosmos-sdk`包被引入：
   - [`codec`](https://godoc.org/github.com/cosmos/cosmos-sdk/codec) - 提供负责Cosmos编码格式的工具——[Amino](https://github.com/tendermint/go-amino)。
-  - [`bank`](https://godoc.org/github.com/tuckermint/sdk-tutorials/x/bank) - `bank`模块控制账户和转账。
+  - [`bank`](https://godoc.org/github.com/tuckermint/sdk-tutorials/tuckermint/x/bank) - `bank`模块控制账户和转账。
   - [`types`](https://godoc.org/github.com/cosmos/cosmos-sdk/types) - `types`包含了整个SDK常用的类型。
 - `Keeper`结构体。在 keeper 中有几个关键部分：
-  - [`bank.Keeper`](https://godoc.org/github.com/tuckermint/sdk-tutorials/x/bank#Keeper) : 这是`bank`模块的`Keeper`引用。包括它来允许该模块中的代码调用`bank`模块的函数。SDK使用[`对象能力`](https://en.wikipedia.org/wiki/Object-capability_model)来访问应用程序状态的各个部分。这是为了允许开发人员采用小权限准入原则，限制错误或恶意模块的去影响其不需要访问的状态的能力。
+  - [`bank.Keeper`](https://godoc.org/github.com/tuckermint/sdk-tutorials/tuckermint/x/bank#Keeper) : 这是`bank`模块的`Keeper`引用。包括它来允许该模块中的代码调用`bank`模块的函数。SDK使用[`对象能力`](https://en.wikipedia.org/wiki/Object-capability_model)来访问应用程序状态的各个部分。这是为了允许开发人员采用小权限准入原则，限制错误或恶意模块的去影响其不需要访问的状态的能力。
   - [`*codec.Codec`](https://godoc.org/github.com/cosmos/cosmos-sdk/codec#Codec) : 这是被Amino用于编码及解码二进制机构的编码解码器的指针。
   - [`sdk.StoreKey`](https://godoc.org/github.com/cosmos/cosmos-sdk/types#StoreKey) : 通过它来访问一个持久化保存你的应用程序状态的`sdk.KVStore`。
 - 模块有1个StoreKey:

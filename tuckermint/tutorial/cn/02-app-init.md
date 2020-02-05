@@ -18,7 +18,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/auth/genaccounts"
 
-	"github.com/tuckermint/sdk-tutorials/x/bank"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/staking"

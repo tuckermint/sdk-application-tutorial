@@ -1,6 +1,6 @@
 # 引入你的模块并完成程序
 
-现在你的模块已就绪，它可以和其它两个模块[`auth`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/auth)和[`bank`](https://godoc.org/github.com/tuckermint/sdk-tutorials/x/bank)被合并到`./app.go`文件中:
+现在你的模块已就绪，它可以和其它两个模块[`auth`](https://godoc.org/github.com/cosmos/cosmos-sdk/x/auth)和[`bank`](https://godoc.org/github.com/tuckermint/sdk-tutorials/tuckermint/x/bank)被合并到`./app.go`文件中:
 
 > 你的应用程序需要导入你刚编写的代码。这里导入路径设置为此存储库（github.com/cosmos/sdk-application-tutorial/tuckermint/x/tuckermint）。如果您是在自己的仓库中进行的前面的操作，则需要更改导入路径（github.com/{.Username}/{.Project.Repo}/x/tuckermint）。
 
@@ -14,7 +14,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/tuckermint/sdk-tutorials/x/bank"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/tuckermint/sdk-tutorials/tuckermint/x/tuckermint"

@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/tuckermint/sdk-tutorials/x/bank"
+	"github.com/tuckermint/sdk-tutorials/tuckermint/x/bank"
 	"github.com/tuckermint/sdk-tutorials/tuckermint/x/tuckermint/client/cli"
 	"github.com/tuckermint/sdk-tutorials/tuckermint/x/tuckermint/client/rest"
 
