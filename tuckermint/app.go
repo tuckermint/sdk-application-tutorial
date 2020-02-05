@@ -90,6 +90,7 @@ type tuckermintApp struct {
 	slashingKeeper slashing.Keeper
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
+        banklessSupplyKeeper supply.Keeper
 	paramsKeeper   params.Keeper
 	nsKeeper       tuckermint.Keeper
 
@@ -152,7 +153,7 @@ func NewTuckermintApp(
                 app.cdc,
                 keys[supply.StoreKey],
                 app.accountKeeper,
-                nil;
+                nil,
                 maccPerms,
         )
 
