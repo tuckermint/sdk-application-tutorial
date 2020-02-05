@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cosmos/sdk-tutorials.git"
+    "url": "git+https://github.com/tuckermint/sdk-tutorials.git"
   },
   "keywords": [
     "Cosmos",
@@ -19,9 +19,9 @@
   "author": "All in Bits",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/cosmos/sdk-tutorials/issues"
+    "url": "https://github.com/tuckermint/sdk-tutorials/issues"
   },
-  "homepage": "https://github.com/cosmos/sdk-tutorials#readme",
+  "homepage": "https://github.com/tuckermint/sdk-tutorials#readme",
   "dependencies": {
     "vuepress-theme-cosmos": "^1.0.140"
   }
