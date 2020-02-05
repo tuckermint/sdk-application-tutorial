@@ -9,6 +9,9 @@
 vendor
 .vendor-new
 build
+node_modules/
+yarn-error.log
+.vuepress/dist
 
 # IDE
 .idea/
