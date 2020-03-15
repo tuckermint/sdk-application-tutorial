@@ -25,6 +25,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+    "github.com/cosmos/cosmos-sdk/x/mint"
+    "github.com/cosmos/cosmos-sdk/x/evidence"    
 
 	"github.com/tuckermint/sdk-tutorials/tuckermint/x/tuckermint"
 )
@@ -50,11 +52,14 @@ var (
 		supply.AppModuleBasic{},
 
 		tuckermint.AppModule{},
+        mint.AppModuleBasic{},
+        evidence.AppModuleBasic{},        
 	)
 	// account permissions
 	maccPerms = map[string][]string{
 		auth.FeeCollectorName:     nil,
 		distr.ModuleName:          nil,
+        mint.ModuleName:           {supply.Minter},        
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 	}
@@ -90,9 +95,11 @@ type tuckermintApp struct {
 	slashingKeeper slashing.Keeper
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
-        banklessSupplyKeeper supply.Keeper
+    banklessSupplyKeeper supply.Keeper
 	paramsKeeper   params.Keeper
 	nsKeeper       tuckermint.Keeper
+    mintKeeper     mint.Keeper
+    evidenceKeeper evidence.Keeper    
 
 	// Module Manager
 	mm *module.Manager
@@ -118,7 +125,7 @@ func NewTuckermintApp(
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, tuckermint.StoreKey)
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, tuckermint.StoreKey, mint.StoreKey, evidence.StoreKey,)
 
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
@@ -139,6 +146,8 @@ func NewTuckermintApp(
 	app.subspaces[staking.ModuleName] = app.paramsKeeper.Subspace(staking.DefaultParamspace)
 	app.subspaces[distr.ModuleName] = app.paramsKeeper.Subspace(distr.DefaultParamspace)
 	app.subspaces[slashing.ModuleName] = app.paramsKeeper.Subspace(slashing.DefaultParamspace)
+    app.subspaces[mint.ModuleName] = app.paramsKeeper.Subspace(mint.DefaultParamspace)
+    app.subspaces[evidence.ModuleName] = app.paramsKeeper.Subspace(evidence.DefaultParamspace)    
 
 	// The AccountKeeper handles address -> account lookups
 	app.accountKeeper = auth.NewAccountKeeper(
@@ -148,14 +157,14 @@ func NewTuckermintApp(
 		auth.ProtoBaseAccount,
 	)
 
-        // bankless supply keeper
-        app.banklessSupplyKeeper = supply.NewKeeper(
-                app.cdc,
-                keys[supply.StoreKey],
-                app.accountKeeper,
-                nil,
-                maccPerms,
-        )
+    // bankless supply keeper
+    app.banklessSupplyKeeper = supply.NewKeeper(
+            app.cdc,
+            keys[supply.StoreKey],
+            app.accountKeeper,
+            nil,
+            maccPerms,
+    )
 
 
 	// The BankKeeper allows you perform sdk.Coins interactions
@@ -215,6 +224,22 @@ func NewTuckermintApp(
 		keys[tuckermint.StoreKey],
 		app.cdc,
 	)
+    
+	app.mintKeeper = mint.NewKeeper(
+		app.cdc, keys[mint.StoreKey], app.subspaces[mint.ModuleName], &stakingKeeper,
+		app.supplyKeeper, auth.FeeCollectorName,
+	)    
+    
+	// create evidence keeper with evidence router
+	evidenceKeeper := evidence.NewKeeper(
+		app.cdc, keys[evidence.StoreKey], app.subspaces[evidence.ModuleName], &stakingKeeper, app.slashingKeeper,
+	)
+	evidenceRouter := evidence.NewRouter()
+
+	// TODO: register evidence routes
+	evidenceKeeper.SetRouter(evidenceRouter)
+
+	app.evidenceKeeper = *evidenceKeeper     
 
 	app.mm = module.NewManager(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
@@ -225,6 +250,8 @@ func NewTuckermintApp(
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
+        mint.NewAppModule(app.mintKeeper),
+        evidence.NewAppModule(app.evidenceKeeper),        
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
@@ -240,8 +267,10 @@ func NewTuckermintApp(
 		bank.ModuleName,
 		slashing.ModuleName,
 		tuckermint.ModuleName,
+        mint.ModuleName,        
 		supply.ModuleName,
 		genutil.ModuleName,
+        evidence.ModuleName,        
 	)
 
 	// register all module routes and module queriers
